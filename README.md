@@ -1,146 +1,160 @@
-<h1> Sbem - a robotics friend </h1>
+# Sbem - A Robotics Friend
 
-<p>
-This is my project, it is a robot built with ROS2 and completely 3D printed.
-I made this in order to learn robotics and ROS framework. I took inspiration from Really Useful robot by James Bruton.
-I used his base for the wheels but I used a different types of motors and electronics. For the ROS2 framework I took inspiration from 
-articuled robotics youtube channel and it gave me a lot of help during my journey to learn ROS2.
+This is my project, a robot built with ROS2 and completely 3D-printed. I created it to learn robotics and the ROS framework. I took inspiration from the **Really Useful Robot** by James Bruton, using his wheelbase but with modified motors and electronics. For ROS2, I followed the **Articulated Robotics** YouTube channel, which greatly helped me during my learning journey. I'm using also the ros2 package **audio_common** provided by **Miguel Ángel González Santamarta**. The chassis is completely designed by me and 3d printed.
 
-	
-These are the main components :    
-	- Two motors from an hoverboard    
- 	- Odrive 3.6 for the motors control    
-  	- Raspberry pi 4 for the comunication with server pc with main features of ROS2    
-    	- ESP32 with MicroROS for the control of Odrive with UART communication    
-    	- Pi camera for docking system and AprilTag identification    
-    	- Lidar A1 for navigation and Nav2 usage  
-    	- LCD Screen for GUI interface and simple debugging of raspberry    
-    	- A microphone for interaction human-machine (TODO array-mic for space detection)  
-     	- (TODO) IntelRealsense d435i for 3D perception  
+The idea behind this robot is to use it for helping people in houses and use it as a friend with the power of LLM 
 
-</p>
+<div style="overflow-x: auto; white-space: nowrap;">
+  <img src="img_readme/img1.jpg" alt="Image 1" style="width:400; display:inline-block;"/>
+  <img src="img_readme/img2.jpg" alt="Image 2" style="width:400px; display:inline-block;"/>
+  <img src="img_readme/img3.jpg" alt="Image 3" style="width:400px; display:inline-block;"/>
+  <img src="img_readme/img4.jpg" alt="Image 4" style="width:400px; display:inline-block;"/>
+</div>
 
-<hr>
+## Main Components
+- **Two motors** from a hoverboard
+- **Odrive 3.6** for motor control
+- **Raspberry Pi 4** for communication with the server PC and ROS2 framework
+- **ESP32 with MicroROS** for controlling Odrive via UART
+- **Pi Camera** for docking system and AprilTag identification
+- **Lidar A1** for navigation and Nav2 usage
+- **LCD Screen** for GUI interface and simple debugging on Raspberry Pi
+- **Microphone** for human-machine interaction *(TODO: Implement an array mic for spatial detection)*
+- **(TODO) Intel RealSense D435i** for 3D perception
 
-<h1> Simple navigation guide </h1>
-<p>This is the procedure to start all packages to perform simple navigation with nav2 stack in real world or in a simulated one</p>
-<p>In the folder of project sbem_project_ws : </p>
+---
 
-<code>
-	
-	source install/setup.bash
- 
-	ros2 launch robot_sbem sbem.launch.py  //launch robot description
- 
-	ros2 run robot_sbem pub_odom_sbem.py  // publish odom wheel
- 
-	ros2 launch robot_sbem footprint_filter_laser.launch.py  // for filtering the shape of robot in the laserscan 
- 
-	ros2 launch robot_sbem joystick.launch.py   // for joystick
- 
-	ros2 launch robot_sbem robot_localization.launch.py   //for fusing wheel odom and imu data (TODO)
- 
-</code>
-<p>After starting this initials nodes required, there is two options :</p>
-<li>
-	Create a new map
-</li>
-<li>
-	Use a custom map already created
-</li>
+# Simple Navigation Guide
+This section explains how to start all required packages for simple navigation using the **Nav2** stack in the real world or simulation.
 
-<h3>Launch this two from terminal to use SBEM with mapping and navigation </h3>
-<code>
-	
-	ros2 launch robot_sbem online_async_launch.py params_file:=./config/mapper_params_online_async.yaml use_sim_time:=false
+### Steps to Start Navigation
+1. Navigate to the project workspace:
 
-	ros2 launch robot_sbem navigation_launch.py
-</code>
+   ```sh
+   cd sbem_project_ws
+   source install/setup.bash
+   ```
 
-<h3>Launch this for using amcl localitation (must set the initial pose in rviz2) and navigation with param map_subscribe_transient_local for not update map </h3>
-<code>
+2. Start essential nodes *(for real robot)*:
 
-	ros2 launch robot_sbem localization_launch.py   //substitute the map that you want (ex: for gazebo ros2 launch robot_sbem localization_launch.py map:=src/robot_sbem/maps/map_gazebo_april.yaml)
+   ```sh
+   ros2 launch robot_sbem sbem.launch.py  # Launch robot description
+   ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry
+   ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
+   ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
+   ros2 launch robot_sbem robot_localization.launch.py  # Fuse wheel odometry and IMU data (TODO)
+   ```
 
-	ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true   // not update the map with navigation
-</code>
+    2.1 *(for simulated robot)*
+      ```sh
+      ros2 launch robot_sbem launch_sim.launch.py # start gazebo simulation, robot description and sensors
+      ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
+      ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
+      ```
 
-<hr>
+### Two Options After Initialization:
+- **1 Create a new map**
+- **2 Use a previously created custom map**
 
-<h2>Send docking message for autodocking</h2>
-<code>
+#### 1) Using SBEM with Mapping and Navigation:
+```sh
+ros2 launch robot_sbem online_async_launch.py params_file:=./config/mapper_params_online_async.yaml use_sim_time:=false
+ros2 launch robot_sbem navigation_launch.py
+```
 
-	ros2 launch sbem_docking docking_sbem.launch.py 
+#### 2) Using AMCL Localization (Set Initial Pose in RViz2):
+```sh
+ros2 launch robot_sbem localization_launch.py  # substitute with map that you want (ex: for gazebo ros2 launch robot_sbem localization_launch.py map:=src/robot_sbem/maps/map_gazebo_april.yaml use_simtime:=true)
+ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true # Prevent map updates # for gazebo use_simtime:=true  
+```
 
-	ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image_raw     -r camera_info:=/camera_info     --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml   //start node that publish apriltag transform
-	
-	// for gazebo : ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/camera/image_raw     -r camera_info:=/camera/camera_info     --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
-</code>
+---
 
-<h3>Message to publish in terminal to perform autodock</h3>
-<code>
+# Docking System
+### Start Docking server by nav2 for Auto-Docking:
+```sh
+ros2 launch sbem_docking docking_sbem.launch.py # for real environment
+ros2 launch sbem_docking docking_sbem.launch.py  params_file_dock:='/home/morolinux/Projects/Sbem/sbem_project_ws/src/sbem_docking/params/docking_simulation.yaml' use_sim_time:=true # for simulation
 
-	ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
-	{
-		use_dock_id: false,
-		dock_pose: {
-			pose: {
-			position: {x: 5.95, y: -1.85, z: 0.0},
-			orientation: {x: -0.0, y: -0.0, z: 0.963, w: 0.268}
-			},
-			header: {
-			frame_id: 'map'
-			}
-		},
-		dock_type: 'nova_carter_dock',
-		navigate_to_staging_pose: true
-	}"
-</code>
+```
 
-<h3>Message for undocking</h3>
-<code>
+### Start Apriltag detection:
+```
+ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image_raw -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
+```
 
-	ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
-</code>
+*(For Gazebo simulation, use:)*
+```sh
+ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/camera/image_raw -r camera_info:=/camera/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
+```
 
-<hr>
+### Command to send message to docking server: *(change coordinates)*
+```sh
+ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
+{
+  use_dock_id: false,
+  dock_pose: {
+    pose: {
+      position: {x: 5.95, y: -1.85, z: 0.0},
+      orientation: {x: -0.0, y: -0.0, z: 0.963, w: 0.268}
+    },
+    header: {
+      frame_id: 'map'
+    }
+  },
+  dock_type: 'nova_carter_dock',
+  navigate_to_staging_pose: true
+}"
+```
 
-<h2>Sbem AI</h2>
-<p>There is a folder name sbem_AI with all scripts for interact with SBEM LLM and use voice to control the robot. I use langchain and langraph to create an agent that use tools in order to control robot position </p>
+### Command for Undocking: 
+```sh
+ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
+```
 
-<h3>Procedure </h3>
+---
 
-<list>
-	Create a server with Piper or coquiTTS
-</list>
-<list>
-	Start agent_sbem.py
-</list>
+# SBEM AI
+A folder named **sbem_AI** contains all scripts required for interaction with SBEM's LLM-based system. The AI uses **LangChain** and **LangGraph** to create an agent that utilizes tools for controlling the robot's position using voice commands. I tried with last gemini model Gemini 2.0 Flash and local model qwen2.5:14b with ollama
 
-
-
-
-
+### Procedure:
+1. **Start a TTS server** using Piper or CoquiTTS for now.
+2. **Run the AI agent:**
+   ```sh
+   python3 agent_sbem.py
+   ```
 
 
-<hr>
+---
 
-<h2>Procedure to start SBEM raspberry nodes</h2>
-<p>In order to use real sbem robot start this nodes in raspberry</p>
-<code>
+# Starting SBEM Nodes on Raspberry Pi
+To run the real SBEM robot, start the following nodes on the Raspberry Pi:
+```sh
+cd Desktop/sbem_ws/
+source install/setup.bash
+```
 
-	cd Desktop/sbem_ws/
+### Essential ROS2 Nodes:
+```sh
+ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0  # MicroROS communication with ESP32
 
-	source install/setup.bash 
+ros2 run rplidar_ros rplidar_composition --ros-args -p serial_port:=/dev/ttyUSB0 -p frame_id:=laser_frame -p angle_compensate:=true -p scan_mode:=Standard -p serial_baudrate:=115200  # Start Lidar
 
-	ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0  //to start communication with esp32 with microros
+ros2 run v4l2_camera v4l2_camera_node --ros-args -p image_size:="[640,480]" -p camera_frame_id:=camera_link_optical  # Start camera feed
+```
+### Scripts for microphone and play sound in raspberry
+In order to enable microphone and speakers of sbem is required to start 2 scripts in raspberry environment:
+```sh
+ros2 run audio_common audio_capturer_node
+python3 tts_sbem.py
+```
 
-	ros2 run rplidar_ros rplidar_composition --ros-args -p serial_port:=/dev/ttyUSB0 -p frame_id:=laser_frame -p angle_compensate:=true -p scan_mode:=Standard -p serial_baudrate:=115200
-	// alternative : ros2 run rplidar_ros rplidar_composition --ros-args -p serial_port:=/dev/ttyUSB0 -p frame_id:=laser_frame -p angle_compensate:=true -p scan_mode:=Standard
-
-	ros2 run v4l2_camera v4l2_camera_node --ros-args -p image_size:="[640,480]" -p camera_frame_id:=camera_link_optical  //for publish camera view
-
-</code>
+### SBEM App
+There is simple gui interface that can be used in order to chat with sbem llm system. The app is written in javascript and it use electron framework, 
+to provide communication between ROS2 and javascript world I use rosbridge and roslib library. Start rosbridge server:
+```sh
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+```
 
 
 
