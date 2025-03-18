@@ -1,0 +1,458 @@
+<?xml version="1.0" ?>
+<robot name="robot_sbem" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find robot_sbem)/description/gazebo_control.xacro" />
+<xacro:include filename="$(find robot_sbem)/description/materials.xacro" />
+<xacro:include filename="$(find robot_sbem)/description/inertial_macros.xacro" />
+<xacro:include filename="lidar.xacro" />
+<xacro:include filename="$(find robot_sbem)/description/depth_camera.xacro" /> 
+<xacro:include filename="camera.xacro" />
+
+
+
+
+
+<!-- BASE LINK -->
+
+<link name="base_link">
+
+</link>
+
+
+<!-- BASE FOOTPRINT LINK -->
+<joint name="base_footprint_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+<link name="base_footprint">
+</link>
+
+
+<!-- BODY LINK -->
+
+<joint name="chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin xyz="-0.1 0 0"/>
+</joint>
+
+<link name="chassis">
+    <visual>
+        <origin xyz="0.01 -0.04 -0.075"/>
+        <geometry>
+            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white"/> 
+    </visual>
+    <collision>
+        <origin xyz="0.10 -0.04 -0.075"/>
+        <geometry>
+            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
+        </geometry> 
+    </collision>
+    <inertial>
+        <origin xyz="0.01 -0.04 -0.075" rpy="0 0 0"/>
+        <mass value="0.476900692892485"/>
+        <inertia ixx="1.283383" iyy="1.267627" izz="1.750151" ixy="-0.000192" iyz="-0.005412" ixz="0.001357"/>
+      </inertial>
+
+</link>
+
+<!-- <link name="chassis">
+    <visual>
+        <origin xyz="0.0 -0.04 0.1"/>
+        <geometry>
+            <cylinder radius="0.22" length="0.22"/>
+        </geometry>
+        <material name="white"/>
+    </visual>
+    <collision>
+        <origin xyz="0.0 0 0.1"/>
+        <geometry>
+          <cylinder radius="0.22" length="0.22"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="0.5" length="0.22" radius="0.22">
+        <origin xyz="0.10 0 0.06" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+
+</link> -->
+
+<gazebo reference="chassis">
+    <material>Gazebo/White</material>
+</gazebo>
+
+
+
+<link name="internal_body">
+    <inertial>
+      <origin xyz="-0.1 -0.04 -0.078" rpy="0 0 0"/>
+      <mass value="0.54535521653018"/>
+      <inertia ixx="0.220166" iyy="0.326028" izz="0.379994" ixy="-5.3e-05" iyz="-5e-06" ixz="-0.018753"/>
+    </inertial>
+    <visual>
+        <origin xyz="-0.1 -0.04 -0.078"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+        <origin xyz="-0.1 -0.04 -0.078"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="internal_body_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="internal_body"/>
+  </joint>
+
+  <gazebo reference="internal_body">
+        <material>Gazebo/Blue</material>
+        <mu1>0.2</mu1>
+        <mu2>0.2</mu2>
+    </gazebo>
+
+
+<!-- LEFT WHEEL LINK -->
+
+<joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="-0.075 0.175 0" rpy="-${pi/2} 0 0" />
+    <axis xyz="0 0 5"/>
+</joint>
+
+<link name="left_wheel">
+    <visual>
+        <geometry>
+            <cylinder radius="0.08" length="0.04"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <geometry>
+          <cylinder radius="0.08" length="0.04"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="1" length="0.04" radius="0.08">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="left_wheel">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+<!-- RIGHT WHEEL LINK -->
+
+<joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin xyz="-0.075 -0.175 0" rpy="${pi/2} 0 0" />
+    <axis xyz="0 0 -1"/>
+</joint>
+
+<link name="right_wheel">
+    <visual>
+        <geometry>
+          <cylinder radius="0.08" length="0.04"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    <collision>
+        <geometry>
+          <cylinder radius="0.08" length="0.04"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="1" length="0.04" radius="0.08">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="right_wheel">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+<!-- CASTER WHEEL LINK -->
+
+<joint name="caster_wheel_joint_1" type="fixed">
+    <parent link="chassis"/>
+    <child link="caster_wheel_1"/>
+    <origin xyz="0.14 0 -0.030"/>
+</joint>
+
+
+<link name="caster_wheel_1">
+    <visual>
+        <geometry>
+            <sphere radius="0.05"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <sphere radius="0.05"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_sphere mass="0.1" radius="0.05">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_sphere>
+</link>
+
+<gazebo reference="caster_wheel_1">
+    <material>Gazebo/White</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+
+
+
+
+<joint name="caster_wheel_joint_2" type="fixed">
+    <parent link="chassis"/>
+    <child link="caster_wheel_2"/>
+    <origin xyz="-0.1 0 -0.030"/>
+</joint>
+
+<link name="caster_wheel_2">
+    <visual>
+        <geometry>
+            <sphere radius="0.05"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <sphere radius="0.05"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_sphere mass="0.1" radius="0.08">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_sphere>
+</link>
+
+<gazebo reference="caster_wheel_2">
+    <material>Gazebo/White</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+
+
+
+<!-- 
+<joint name="charging_dock_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="charging_dock"/>
+    <origin xyz="0.15 0 -0.030"/>
+</joint>
+
+<link name="charging_dock">
+    <visual>
+        <geometry>
+            <mesh filename="file://$(find robot_sbem)/meshes/charging_dock.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white"/>
+    </visual>
+    <collision>
+        <geometry>
+            <mesh filename="file://$(find robot_sbem)/meshes/charging_dock.stl" scale="0.001 0.001 0.001"/>
+          </geometry>
+    </collision>
+    <inertial>
+        <mass value="0.06"/>
+        <inertia ixx="0.905366" iyy="0.541365" izz="0.75836" ixy="-5.7e-05" iyz="-0.000152" ixz="0.05854"/>
+    </inertial>
+</link>
+
+<gazebo reference="charging_dock">
+    <material>Gazebo/White</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>  -->
+
+
+
+<link name="central_body">
+    <inertial>
+      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
+      <mass value="0.460328263120194"/>
+      <inertia ixx="0.905366" iyy="0.541365" izz="0.75836" ixy="-5.7e-05" iyz="-0.000152" ixz="0.05854"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/central_body_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <!-- <geometry>
+        <cylinder radius="0.216" length="0.342"/>
+      </geometry> -->
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/central_body_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <!-- <geometry>
+        <cylinder radius="0.216" length="0.342"/>
+      </geometry> -->
+    </collision>
+  </link>
+
+
+  <joint name="joint_cover_base" type="fixed">
+    <origin xyz="0.020 0 0.405" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="central_body"/>
+  </joint>
+
+  <gazebo reference="central_body">
+    <material>Gazebo/White</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+
+
+
+  <link name="upper_body">
+    <inertial>
+      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
+      <mass value="0.509819302869698"/>
+      <inertia ixx="0.505323" iyy="0.34562" izz="0.302736" ixy="-0.000304" iyz="-0.001097" ixz="-0.112705"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/upper_body_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_sbem)/meshes/upper_body_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <joint name="joint_upper_body" type="fixed">
+    <origin xyz="0.0 0.0 0.171" rpy="0 0 0"/> <!-- <origin xyz="0.0 0.0 0.342" rpy="0 0 0"/>-->
+    <parent link="central_body"/>
+    <child link="upper_body"/>
+  </joint>
+
+
+  <gazebo reference="upper_body">
+    <material>Gazebo/White</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+  </gazebo>
+
+
+
+<!-- IMU SECTION-->
+
+<joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu"/>
+    <origin xyz="-0.03 0 0.2"/>
+</joint>
+
+
+<link name="imu">
+    <visual>
+        <geometry>
+            <box size="0.01 0.02 0.01"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <box size="0.01 0.02 0.01"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_box mass="0.001" x="0.30" y="0.27" z="0.12">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_box>
+</link>
+
+<gazebo reference="imu">
+    <material>Gazebo/White</material>
+</gazebo>
+
+
+
+<!-- section to check plugin shape robot in range of lidar-->
+<!--
+<joint name="cylinder_joint_1" type="fixed">
+    <parent link="chassis"/>
+    <child link="cylinder_1"/>
+    <origin xyz="0 0.15 0.30"/>
+</joint>
+
+
+<link name="cylinder_1">
+    <visual>
+        <geometry>
+            <cylinder radius="0.015" length="0.5"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder radius="0.015" length="0.5"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="0.5" radius="0.015">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="cylinder_1">
+    <material>Gazebo/black</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+
+
+<joint name="cylinder_joint_2" type="fixed">
+    <parent link="chassis"/>
+    <child link="cylinder_2"/>
+    <origin xyz="0 -0.15 0.30"/>
+</joint>
+
+
+<link name="cylinder_2">
+    <visual>
+        <geometry>
+            <cylinder radius="0.015" length="0.5"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder radius="0.015" length="0.5"/>
+        </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" length="0.5" radius="0.015">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+</link>
+
+<gazebo reference="cylinder_2">
+    <material>Gazebo/black</material>
+    <mu1 value="0.001"/>
+    <mu2 value="0.001"/>
+</gazebo>
+ -->
+
+
+</robot>

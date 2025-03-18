@@ -1,0 +1,16 @@
+<launch>
+
+    <include file="$(find-pkg-share robot_sbem)/launch/sbem.launch.py"/>
+    <include file="$(find-pkg-share robot_sbem)/launch/odom_pub.launch.py"/>
+    <include file="$(find-pkg-share robot_sbem)/launch/footprint_filter_laser.launch.py"/>
+    <include file="$(find-pkg-share robot_sbem)/launch/robot_localization.launch.py"/>
+    
+    <include file="$(find-pkg-share robot_sbem)/launch/localization_launch.py"/>
+    
+    <include file="$(find-pkg-share robot_sbem)/launch/navigation_launch.py">
+        <arg name="map_subscribe_transient_local" value="true"/>
+    </include>
+
+    <include file="$(find-pkg-share sbem_docking)/launch/docking_sbem.launch.py"/>
+    
+</launch>
