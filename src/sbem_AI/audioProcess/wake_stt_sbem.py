@@ -43,6 +43,8 @@ RATE = 16000
 swidth = 2
 CHUNK = 1280
 
+openwakeword.utils.download_models()
+
 class ProcessAudio(Node):
 
     def __init__(self):
@@ -53,7 +55,7 @@ class ProcessAudio(Node):
         
         self.model = WhisperModel("large-v3", device="cuda", compute_type="float16")
 
-        self.model_wake_word = Model(wakeword_models=["/home/morolinux/Projects/Sbem/sbem_project_ws/src/sbem_AI/audioProcess/spem.tflite"],inference_framework="tflite")
+        self.model_wake_word = Model(wakeword_models=["/home/morolinux/Projects/Sbem/sbem_project_ws/src/sbem_AI/audioProcess/spem_v2.tflite"],inference_framework="tflite")
 
         
 
@@ -162,7 +164,7 @@ class ProcessAudio(Node):
         prediction = self.model_wake_word.predict(np.frombuffer(self.data_audio, dtype=np.int16))
 
         #calculate current score for wake word
-        scores = list(self.model_wake_word.prediction_buffer["spem"])
+        scores = list(self.model_wake_word.prediction_buffer["spem_v2"])
         curr_score = format(scores[-1], '.20f').replace("-", "")
 
 

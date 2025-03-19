@@ -121,7 +121,7 @@ def main(args=None):
 
 
     #initiate the audio nodes
-    tts_node = tts_sbem.AudioPlayerNode(useLocalTTS=True)
+    tts_node = tts_sbem.AudioPlayerNode(useLocalTTS=False)
     wake_stt_node = wake_stt_sbem.ProcessAudio()
 
     executor = MultiThreadedExecutor()

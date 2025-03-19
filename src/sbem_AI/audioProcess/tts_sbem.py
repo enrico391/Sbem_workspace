@@ -54,36 +54,42 @@ class AudioPlayerNode(Node):
             
              #send request to piper server for transcribe or publish over topic
             if self.useLocalTTS :
+                # send request and save a file named output.wav
                 self.requestTTS.sendRequest(msg.data)
 
                 chunk = 1024
 
-                wf = wave.open("output.wav", 'rb')
+                try:
+                    wf = wave.open("output.wav", 'rb')
+                
 
-                # create an audio object
-                p = pyaudio.PyAudio()
 
-                # open stream based on the wave object which has been input.
-                stream = p.open(format =
-                                p.get_format_from_width(wf.getsampwidth()),
-                                channels = wf.getnchannels(),
-                                rate = wf.getframerate(),
-                                output = True)
+                    # create an audio object
+                    p = pyaudio.PyAudio()
 
-                # read data (based on the chunk size)
-                data = wf.readframes(chunk)
+                    # open stream based on the wave object which has been input.
+                    stream = p.open(format =
+                                    p.get_format_from_width(wf.getsampwidth()),
+                                    channels = wf.getnchannels(),
+                                    rate = wf.getframerate(),
+                                    output = True)
 
-                # play stream (looping from beginning of file to the end)
-                while data:
-                    # writing to the stream is what *actually* plays the sound.
-                    stream.write(data)
+                    # read data (based on the chunk size)
                     data = wf.readframes(chunk)
 
-                # cleanup stuff.
-                wf.close()
-                stream.close()    
-                p.terminate()
+                    # play stream (looping from beginning of file to the end)
+                    while data:
+                        # writing to the stream is what *actually* plays the sound.
+                        stream.write(data)
+                        data = wf.readframes(chunk)
 
+                    # cleanup stuff.
+                    wf.close()
+                    stream.close()    
+                    p.terminate()
+                    
+                except FileNotFoundError:
+                    self.get_logger().error("File not found")
 
             # or use gTTS
             else:
