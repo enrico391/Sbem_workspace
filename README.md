@@ -1,4 +1,4 @@
-# Sbem - A Robotics Friend
+# Sbem - A Robotic Friend
 
 This is my project, a robot built with ROS2 and completely 3D-printed. I created it to learn robotics and the ROS framework. I took inspiration from the **Really Useful Robot** by James Bruton, using his wheelbase but with modified motors and electronics. For ROS2, I followed the **Articulated Robotics** YouTube channel, which greatly helped me during my learning journey. I'm using also the ros2 package **audio_common** provided by **Miguel Ángel González Santamarta**. The chassis is completely designed by me and 3d printed.
 
