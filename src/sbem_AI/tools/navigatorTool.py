@@ -29,7 +29,7 @@ from tools.savePositionTool import positions
 
 #Tool for nav to pose
 class NavigatorInput(BaseModel):
-    coord: dict = Field(description="This is necessary only to go in a specific position, dict of 2 position in x, y and 2 orientations in w and z coordinates for the final pose, the number MUST be float type")
+    coord: dict = Field(description="This is necessary to go in a specific position, dict of 2 position in x, y and 2 orientations in w and z coordinates for the final pose, the number MUST be float type, set all to 0.0 if you use the namePos")
     namePos: str = Field(description="the appropriate name of the position or leaves blank if you don't know")
     
 class NavigatorCommander(BaseTool):
@@ -45,7 +45,7 @@ class NavigatorCommander(BaseTool):
         super().__init__()
         
 
-    def _run(self, coord: dict, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None):
+    def _run(self, coord: dict, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         
         if(namePos != ""):
             coord = positions.get(namePos)
@@ -61,8 +61,8 @@ class NavigatorCommander(BaseTool):
         goal_pose.header.stamp = self._navigator.get_clock().now().to_msg()
         goal_pose.pose.position.x = float(coord["x"])
         goal_pose.pose.position.y = float(coord["y"])
-        goal_pose.pose.orientation.w = float(coord["w"])
-        goal_pose.pose.orientation.z = float(coord["z"])
+        goal_pose.pose.orientation.w = 0.0 #float(coord["w"])
+        goal_pose.pose.orientation.z = 1.0 #float(coord["z"])
 
         self._navigator.goToPose(goal_pose)
         i = 0

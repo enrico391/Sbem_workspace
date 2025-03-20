@@ -41,6 +41,14 @@ def generate_launch_description():
             'init_pose_yaw',
             default_value='0.0',
             description='Initial yaw orientation'),
+        DeclareLaunchArgument(
+            'params_file_dock',
+            default_value=os.path.join(
+                 get_package_share_directory(
+                     'sbem_docking'),
+                 'params', 'nova_carter_docking.yaml'
+             ),
+            description='Full path to the docking param file to load'),
         # DeclareLaunchArgument(
         #     'map',
         #     default_value=os.path.join(
@@ -75,7 +83,7 @@ def generate_launch_description():
     init_pose_y = LaunchConfiguration('init_pose_y', default=0.0)
     init_pose_yaw = LaunchConfiguration('init_pose_yaw', default=0.0)
     map_dir = LaunchConfiguration('map')
-    #nav_params_file = LaunchConfiguration('nav_params_file',)
+    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('sbem_docking'),'params', 'nova_carter_docking.yaml'))
     launch_rviz = LaunchConfiguration('launch_rviz')
     image = LaunchConfiguration('image')
     camera_info = LaunchConfiguration('camera_info')
@@ -95,18 +103,17 @@ def generate_launch_description():
 
     nova_carter_dock_params_dir = os.path.join(
         get_package_share_directory('sbem_docking'), 'params')
-    nav2_bringup_launch_dir = os.path.join(
-        get_package_share_directory('nav2_bringup'), 'launch')
+    
+    # nav2_bringup_launch_dir = os.path.join(
+    #     get_package_share_directory('nav2_bringup'), 'launch')
 
-    params_file = os.path.join(
-        nova_carter_dock_params_dir, 'nova_carter_docking.yaml')
 
     docking_server = Node(
         package='opennav_docking',
         executable='opennav_docking',
         name='docking_server',
         output='screen',
-        parameters=[params_file,
+        parameters=[params_file_dock,
                     {'use_sim_time': use_sim_time}],
     )
 

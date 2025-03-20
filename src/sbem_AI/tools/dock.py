@@ -64,7 +64,7 @@ class DockingTester(Node):
 
         goal_msg = DockRobot.Goal()
         goal_msg.use_dock_id = False
-        # goal_msg.dock_id = dock_id  # if wanting to use ID instead
+        #goal_msg.dock_id = "main_dock"  # if wanting to use ID instead
         goal_msg.dock_pose = dock_pose
         goal_msg.dock_type = dock_type
         goal_msg.navigate_to_staging_pose = True  # if want to navigate before staging

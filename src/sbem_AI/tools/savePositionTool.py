@@ -31,7 +31,7 @@ class SavePosition(BaseTool):
         super().__init__()
         
 
-    def _run(self, getPos: bool, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None):
+    def _run(self, getPos: bool, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None)-> str:
         #store current position in the list
         if(getPos == False):
             
@@ -42,14 +42,14 @@ class SavePosition(BaseTool):
                 return "You must insert a name for the position"
             else:
                 positions.update({namePos: {"x":  current_pose.transform.translation.x, "y":  current_pose.transform.translation.y, "w": current_pose.transform.rotation.w, "z": current_pose.transform.rotation.z}})
-                return True
+                return "The position is stored successfully"
         
         elif(getPos == True):
             #get the stored position
             if(namePos in positions):
                 return positions[namePos]
             else:
-                return False
+                return "The position is not stored"
 
 
 

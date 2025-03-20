@@ -50,7 +50,7 @@ class AutoDockCommander(BaseTool):
         # self._tester = DockingTester()
         # self._tester.startup()
     
-    def _run(self, typeAction: bool, run_manager: Optional[CallbackManagerForToolRun] = None):
+    def _run(self, typeAction: bool, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         """Use dock or undock."""
         self._tester = DockingTester()
         self._tester.startup()
@@ -60,14 +60,23 @@ class AutoDockCommander(BaseTool):
             dock_pose.header.stamp = self._tester.get_clock().now().to_msg()
             dock_pose.header.frame_id = "map"
 
-            #coordinates for the dock
-            dock_pose.pose.position.x = 5.993222767289538
-            dock_pose.pose.position.y = -2.0058217548165835
+            #coordinates for the dock real world
+            # dock_pose.pose.position.x = 5.993222767289538 
+            # dock_pose.pose.position.y = -2.0058217548165835 
+            # dock_pose.pose.position.z = 0.0
+            # dock_pose.pose.orientation.x = 0.0
+            # dock_pose.pose.orientation.y = 0.0
+            # dock_pose.pose.orientation.z = 0.96093202830228586
+            # dock_pose.pose.orientation.w = 0.27678445943162139
+
+            #coordinates for the dock gazebo
+            dock_pose.pose.position.x = -0.23
+            dock_pose.pose.position.y = 9.762020221672746
             dock_pose.pose.position.z = 0.0
             dock_pose.pose.orientation.x = 0.0
             dock_pose.pose.orientation.y = 0.0
-            dock_pose.pose.orientation.z = 0.96093202830228586
-            dock_pose.pose.orientation.w = 0.27678445943162139
+            dock_pose.pose.orientation.z = 0.7399855606493145
+            dock_pose.pose.orientation.w = 0.6726227546153352
             
 
             self._tester.dockRobot(dock_pose)

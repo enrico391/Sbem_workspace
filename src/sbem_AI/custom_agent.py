@@ -10,6 +10,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import SystemMessage, RemoveMessage, HumanMessage
 from typing import Literal
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 from datetime import date
@@ -39,6 +40,9 @@ class myAgent():
 
         tools = [search, tools_sbem.getsqrt,moveTool.moveCommander, savePosTool.savePosCommander , autoDockTool.DockCommander,
                         navCommandTool.NavCommander, tools_sbem.get_image ]
+        
+        
+        
 
 
         prompt = ("You are SBEM a differential robot type with the ability to move in the house using your tools. " +
@@ -56,6 +60,11 @@ class myAgent():
         # create a state graph
         self.graph_builder = StateGraph(State)
 
+        #self.model = ChatGoogleGenerativeAI(
+        #            model="gemini-2.0-pro-exp-02-05",
+        #            temperature=0,          
+        #        )
+
         self.model = ChatOllama(
             base_url="http://localhost:11434",
             model="qwen2.5:14b",
@@ -64,19 +73,20 @@ class myAgent():
 
         self.model.bind_tools(tools)
 
-        # add the chatbot node to the graph
-        self.graph_builder.add_node("chatbot", self.chatbot)
-
+    
         # add summarize node to the graph
-        self.graph_builder.add_node(self.summarize_conversation)
+        #self.graph_builder.add_node(self.summarize_conversation)
 
         # add tools to the graph
         tool_node = ToolNode(tools=tools)
         self.graph_builder.add_node("tools",tool_node)
 
+        # add chatbot node to the graph with the tools
+        self.graph_builder.add_node("chatbot", lambda state: {"messages":self.model.bind_tools(tools).invoke(state['messages'])})
+
         # add condition edges to the graph
         self.graph_builder.add_conditional_edges("chatbot", tools_condition)
-        self.graph_builder.add_conditional_edges("chatbot", self.should_continue)
+        #self.graph_builder.add_conditional_edges("chatbot", self.should_continue)
 
         # entry point
         self.graph_builder.add_edge(START, "chatbot")
@@ -146,6 +156,7 @@ class myAgent():
                                 self.config,
                                 stream_mode="values")
         for event in events:
+            print(event)
             event["messages"][-1].pretty_print()
             if "summary" in event:
                 print(event["summary"])
@@ -156,25 +167,18 @@ class myAgent():
 
 
 
+# while True:
+#     try:
+#         my_custom_agent = myAgent()
+#         user_input = input("User: ")
+#         if user_input.lower() in ["quit", "exit", "q"]:
+#             print("Goodbye!")
+#             break
 
-
-
-
-
-
-
-while True:
-    try:
-        my_custom_agent = myAgent()
-        user_input = input("User: ")
-        if user_input.lower() in ["quit", "exit", "q"]:
-            print("Goodbye!")
-            break
-
-        my_custom_agent.stream_graph_updates(user_input)
-    except:
-        # fallback if input() is not available
-        user_input = "What do you know about LangGraph?"
-        print("User: " + user_input)
-        my_custom_agent.stream_graph_updates(user_input)
-        break
+#         my_custom_agent.stream_graph_updates(user_input)
+#     except:
+#         # fallback if input() is not available
+#         user_input = "What do you know about LangGraph?"
+#         print("User: " + user_input)
+#         my_custom_agent.stream_graph_updates(user_input)
+#         break

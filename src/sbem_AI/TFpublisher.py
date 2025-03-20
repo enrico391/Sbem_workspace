@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+# Class for agent tool savePosition
+
+
 import rclpy
 from rclpy.node import Node
 import rclpy.time
@@ -34,16 +38,7 @@ class TfEcho(Node):
             trans = self.tf_buffer.lookup_transform(self.target_frame,
                                                     self.source_frame,
                                                     now)
-            # self.get_logger().info(f"Transform from {self.source_frame} to {self.target_frame}:")
-            # self.get_logger().info(f"Translation: x={trans.transform.translation.x:.2f}, "
-            #                        f"y={trans.transform.translation.y:.2f}, "
-            #                        f"z={trans.transform.translation.z:.2f}")
-            # self.get_logger().info(f"Rotation (quaternion): x={trans.transform.rotation.x:.2f}, "
-            #                        f"y={trans.transform.rotation.y:.2f}, "
-            #                        f"z={trans.transform.rotation.z:.2f}, "
-            #                        f"w={trans.transform.rotation.w:.2f}")
-            
-    
+        
             
             current_pose.child_frame_id = self.source_frame
             current_pose.header.frame_id = self.target_frame
@@ -53,7 +48,6 @@ class TfEcho(Node):
             current_pose.transform.rotation.w = trans.transform.rotation.w
             current_pose.transform.rotation.z = trans.transform.rotation.z
 
-            #self.tf_pub.publish(current_pose)
 
         except TransformException as ex:
             self.get_logger().warn(f"Could not transform {self.source_frame} to {self.target_frame}: {ex}")
@@ -61,19 +55,3 @@ class TfEcho(Node):
 
     def return_current_pose(self):
         return current_pose
-# def main(args=None):
-#     rclpy.init(args=args)
-#     # Change these frame names as necessary.
-#     target_frame = "map"
-#     source_frame = "base_link"
-#     node = TfEcho()
-#     try:
-#         rclpy.spin(node)
-#     except KeyboardInterrupt:
-#         node.get_logger().info("TF echo node shutting down.")
-#     finally:
-#         node.destroy_node()
-#         rclpy.shutdown()
-
-# if __name__ == '__main__':
-#     main()
