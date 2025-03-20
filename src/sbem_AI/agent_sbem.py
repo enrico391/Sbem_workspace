@@ -11,8 +11,9 @@ from langchain_core.messages import HumanMessage
 from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.schema import AIMessage
+from langchain_core.messages import SystemMessage
 
-
+from datetime import date
 
 #ROS imports
 from rclpy.node import Node
@@ -63,12 +64,15 @@ class AgentClass(Node):
 
         memory = MemorySaver()
 
-        prompt = ("You are SBEM a differential robot type with the ability to move in the house using your tools. " +
-             "You can save positions if required or navigate to the web to find useful informations for the user. " +
-             "You can see the word and use you tool to manage what you see. " +
-             "You can also dock to recharge your battery. You MUST required all the actions that you wants to do. " +
-             "You need to response with a simple sentence. You can talk in italian if the user wants to talk in italian." +
-             "You MUST send a message to the user before the usage of tools and one after the usage of tools.")
+        prompt = SystemMessage(content=(f"""
+             You are SBEM a differential robot type with the ability to move in the house using your tools.
+             You can save positions if required or navigate to the web to find useful informations for the user.
+             You can see the word and use you tool to manage what you see.
+             You can also dock to recharge your battery. You MUST required all the actions that you wants to do.
+             You need to response with a simple sentence. You can talk in italian if the user wants to talk in italian.
+             You MUST send a message to the user before the usage of tools and one after the usage of tools.
+             Today is {str(date.today())}
+            """))
 
         model = ChatOllama(
             base_url="http://localhost:11434",
@@ -81,7 +85,7 @@ class AgentClass(Node):
         #            temperature=0,          
         #        )
     
-
+        
         #create agent
         self.agent_executor = create_react_agent(model, tools, prompt=prompt, checkpointer=memory)
         self.config = {"configurable": {"thread_id": "abc1333"}}
