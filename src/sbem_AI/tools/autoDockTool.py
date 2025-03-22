@@ -94,13 +94,13 @@ class AutoDockCommander(BaseTool):
 
             # Do something depending on the return code
             result = self._tester.getResult()
-            if result == TaskResult.SUCCEEDED:
+            if result.name == "SUCCEEDED":
                 print('Docking succeeded!')
                 return "Docking succeded!"
-            elif result == TaskResult.CANCELED:
+            elif result.name == "CANCELED":
                 print('Docking canceled!')
                 return "Docking canceled!"
-            elif result == TaskResult.FAILED:
+            elif result.name == "FAILED":
                 print('Docking failed!')
                 return "Docking failed!"
             else:
@@ -121,13 +121,13 @@ class AutoDockCommander(BaseTool):
 
             # Do something depending on the return code
             result = self._tester.getResult()
-            if result == TaskResult.SUCCEEDED:
+            if result.name == "SUCCEEDED":
                 print('Undock succeeded!')
                 return "Undock succeeded!"
-            elif result == TaskResult.CANCELED:
+            elif result.name == "CANCELED":
                 print('Undock canceled!')
                 return "Undock canceled"
-            elif result == TaskResult.FAILED:
+            elif result.name == "FAILED":
                 print('Undock failed!')
                 return "Undock failed!"
             else:

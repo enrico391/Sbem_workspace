@@ -29,7 +29,8 @@ import tools.navigatorTool as navCommandTool
 import tools.autoDockTool as autoDockTool
 import tools.MoveTool as moveTool
 import tools.savePositionTool as savePosTool
-import TFpublisher
+from TFpublisher import TfEcho
+
 
 
 #audio imports files
@@ -116,21 +117,18 @@ class AgentClass(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    
     #initiate the class for publishing the current pose
-    tfpub = TFpublisher.TfEcho()
+    tfpub = TfEcho()
 
     #initiate the class for the agent with langchain
     agent = AgentClass()
-
 
     #initiate the audio nodes
     tts_node = tts_sbem.AudioPlayerNode(useLocalTTS=False)
     wake_stt_node = wake_stt_sbem.ProcessAudio()
 
-    executor = MultiThreadedExecutor()
 
-    
+    executor = MultiThreadedExecutor()
     executor.add_node(tfpub)
     executor.add_node(tts_node)
     executor.add_node(wake_stt_node)
@@ -138,8 +136,6 @@ def main(args=None):
 
 
     executor.spin()
-    
-    
     executor.destroy_node()
     rclpy.shutdown()
 

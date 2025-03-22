@@ -12,6 +12,7 @@ from pydantic import PrivateAttr
 
 from TFpublisher import current_pose
 
+
 positions = dict()
 
 #Tool for nav to pose
@@ -34,10 +35,7 @@ class SavePosition(BaseTool):
     def _run(self, getPos: bool, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None)-> str:
         #store current position in the list
         if(getPos == False):
-            
-            print(current_pose)
-
-            print(positions)
+            #print(positions)
             if(namePos == ""):
                 return "You must insert a name for the position"
             else:

@@ -10,7 +10,7 @@ import tf2_ros
 from tf2_ros import TransformException
 from geometry_msgs.msg import TransformStamped
 
-
+#TODO REMOVE THIS GLOBAL VARIABLE
 current_pose = TransformStamped()
 
 
@@ -39,7 +39,6 @@ class TfEcho(Node):
                                                     self.source_frame,
                                                     now)
         
-            
             current_pose.child_frame_id = self.source_frame
             current_pose.header.frame_id = self.target_frame
             current_pose.header.stamp.sec = rclpy.time.Time().seconds_nanoseconds()[0]
@@ -48,10 +47,9 @@ class TfEcho(Node):
             current_pose.transform.rotation.w = trans.transform.rotation.w
             current_pose.transform.rotation.z = trans.transform.rotation.z
 
-
         except TransformException as ex:
-            self.get_logger().warn(f"Could not transform {self.source_frame} to {self.target_frame}: {ex}")
-
+            #self.get_logger().warn(f"Could not transform {self.source_frame} to {self.target_frame}: {ex}")
+            pass
 
     def return_current_pose(self):
         return current_pose
