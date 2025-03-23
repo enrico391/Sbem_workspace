@@ -10,10 +10,8 @@ from langchain_core.callbacks import (
 from pydantic import PrivateAttr
 
 
-from TFpublisher import current_pose
+from positionManager import PositionsManager
 
-
-positions = dict()
 
 #Tool for nav to pose
 class SavePosInput(BaseModel):
@@ -26,29 +24,30 @@ class SavePosition(BaseTool):
     description: str = "Useful to store the current position. If the user wants to obtain coordinates you can use the appropriate name and get the coordinates"
     args_schema: Type[BaseModel] = SavePosInput
     #return_direct: bool = True
+    _tf_manage: PositionsManager = PrivateAttr()
     
 
-    def __init__(self):
+    def __init__(self, tf_manage: PositionsManager):
         super().__init__()
+        self._tf_manage = tf_manage
         
 
     def _run(self, getPos: bool, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None)-> str:
         #store current position in the list
         if(getPos == False):
-            #print(positions)
             if(namePos == ""):
                 return "You must insert a name for the position"
             else:
-                positions.update({namePos: {"x":  current_pose.transform.translation.x, "y":  current_pose.transform.translation.y, "w": current_pose.transform.rotation.w, "z": current_pose.transform.rotation.z}})
+                #get current pose from tf manager
+                pose = self._tf_manage.return_current_pose()
+                # add position
+                self._tf_manage.update_position(namePos, pose)
+                #positions.update({namePos: {"x":  pose.transform.translation.x, "y":  pose.transform.translation.y, "w": pose.transform.rotation.w, "z": pose.transform.rotation.z}})
                 return "The position is stored successfully"
-        
+        #return position coordinates
         elif(getPos == True):
             #get the stored position
-            if(namePos in positions):
-                return positions[namePos]
+            if(namePos in self._tf_manage.return_position()):
+                return self._tf_manage.return_position().get(namePos)
             else:
                 return "The position is not stored"
-
-
-
-savePosCommander = SavePosition()

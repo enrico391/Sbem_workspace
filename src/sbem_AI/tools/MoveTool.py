@@ -121,6 +121,3 @@ class MoveCommander(BaseTool):
         else:
             return "Type of action not recognized"
 
-
-
-moveCommander = MoveCommander()

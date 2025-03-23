@@ -22,10 +22,8 @@ from rclpy.duration import Duration
 import tf2_ros
 from geometry_msgs.msg import TransformStamped
 
-#to get current position
-from TFpublisher import current_pose
-from tools.savePositionTool import positions
 
+from positionManager import PositionsManager
 
 #Tool for nav to pose
 class NavigatorInput(BaseModel):
@@ -39,16 +37,16 @@ class NavigatorCommander(BaseTool):
     #return_direct: bool = True
 
     _navigator = PrivateAttr()
-    
+    _tf_manage: PositionsManager = PrivateAttr()
 
-    def __init__(self):
+    def __init__(self, tf_manage):
         super().__init__()
-        
+        self._tf_manage = tf_manage
 
     def _run(self, coord: dict, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         
         if(namePos != ""):
-            coord = positions.get(namePos)
+            coord = self._tf_manage.return_position().get(namePos)
             
         #initialize the navigator
         self._navigator = BasicNavigator()
@@ -100,10 +98,3 @@ class NavigatorCommander(BaseTool):
         else:
             return "Error"
                 
-
-            
-
-
-
-#initialize class tool
-NavCommander = NavigatorCommander()

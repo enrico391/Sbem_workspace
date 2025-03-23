@@ -16,12 +16,13 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from datetime import date
 
 
-# tools imports
+#tools imports
 import tools.sbem_tools as tools_sbem
-import tools.navigatorTool as navCommandTool
-import tools.autoDockTool as autoDockTool
-import tools.MoveTool as moveTool
-import tools.savePositionTool as savePosTool
+from tools.navigatorTool import NavigatorCommander
+from tools.autoDockTool import AutoDockCommander
+from tools.MoveTool import MoveCommander
+from tools.savePositionTool import SavePosition
+from positionManager import PositionsManager
 
 
 
@@ -34,12 +35,16 @@ class State(TypedDict):
 
 
 class myAgent():
-    def __init__(self):
+    def __init__(self, tf_manage):
         # tools 
         search = TavilySearchResults(max_results=2)
 
-        tools = [search, tools_sbem.getsqrt,moveTool.moveCommander, savePosTool.savePosCommander , autoDockTool.DockCommander,
-                        navCommandTool.NavCommander, tools_sbem.get_image ]
+        navCommander = NavigatorCommander(tf_manage)
+        savePositionTool = SavePosition(tf_manage)
+        moveTool = MoveCommander()
+        autoDockTool = AutoDockCommander()
+
+        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, tools_sbem.get_image ]
         
         
         

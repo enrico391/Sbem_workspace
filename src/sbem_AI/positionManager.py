@@ -10,11 +10,10 @@ import tf2_ros
 from tf2_ros import TransformException
 from geometry_msgs.msg import TransformStamped
 
-#TODO REMOVE THIS GLOBAL VARIABLE
-current_pose = TransformStamped()
 
 
-class TfEcho(Node):
+
+class PositionsManager(Node):
     def __init__(self):
         super().__init__('tf_echo')
         self.target_frame = "map"
@@ -26,11 +25,15 @@ class TfEcho(Node):
         
         self.tf_pub = self.create_publisher(TransformStamped,"/current_pose",10)
 
+        # variable to store current position get from robot tf
+        self.current_pose = TransformStamped()
+        # variable to store all saved positions
+        self.positions = dict()
+
         # Create a timer to check for the transform every second.
         self.timer = self.create_timer(1.0, self.timer_callback)
 
         
-    
     def timer_callback(self):
         try:
             # Use the current time to lookup the latest transform.
@@ -39,17 +42,23 @@ class TfEcho(Node):
                                                     self.source_frame,
                                                     now)
         
-            current_pose.child_frame_id = self.source_frame
-            current_pose.header.frame_id = self.target_frame
-            current_pose.header.stamp.sec = rclpy.time.Time().seconds_nanoseconds()[0]
-            current_pose.transform.translation.x = trans.transform.translation.x
-            current_pose.transform.translation.y = trans.transform.translation.y
-            current_pose.transform.rotation.w = trans.transform.rotation.w
-            current_pose.transform.rotation.z = trans.transform.rotation.z
+            self.current_pose.child_frame_id = self.source_frame
+            self.current_pose.header.frame_id = self.target_frame
+            self.current_pose.header.stamp.sec = rclpy.time.Time().seconds_nanoseconds()[0]
+            self.current_pose.transform.translation.x = trans.transform.translation.x
+            self.current_pose.transform.translation.y = trans.transform.translation.y
+            self.current_pose.transform.rotation.w = trans.transform.rotation.w
+            self.current_pose.transform.rotation.z = trans.transform.rotation.z
 
         except TransformException as ex:
             #self.get_logger().warn(f"Could not transform {self.source_frame} to {self.target_frame}: {ex}")
             pass
 
     def return_current_pose(self):
-        return current_pose
+        return self.current_pose
+    
+    def return_position(self):
+        return self.positions
+    
+    def update_position(self, namePos, pose):
+        self.positions.update({namePos: {"x":  pose.transform.translation.x, "y":  pose.transform.translation.y, "w": pose.transform.rotation.w, "z": pose.transform.rotation.z}})

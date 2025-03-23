@@ -25,17 +25,17 @@ from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 
 #tools imports
 import tools.sbem_tools as tools_sbem
-import tools.navigatorTool as navCommandTool
-import tools.autoDockTool as autoDockTool
-import tools.MoveTool as moveTool
-import tools.savePositionTool as savePosTool
-from TFpublisher import TfEcho
+from tools.navigatorTool import NavigatorCommander
+from tools.autoDockTool import AutoDockCommander
+from tools.MoveTool import MoveCommander
+from tools.savePositionTool import SavePosition
+from positionManager import PositionsManager
 
 
 
 #audio imports files
-import audioProcess.tts_sbem as tts_sbem
-import audioProcess.wake_stt_sbem as wake_stt_sbem
+from audioProcess.tts_sbem import AudioPlayerNode
+from audioProcess.wake_stt_sbem import ProcessAudio
 
 
 
@@ -47,7 +47,7 @@ if "GOOGLE_API_KEY" not in os.environ:
 
 class AgentClass(Node):
 
-    def __init__(self):
+    def __init__(self, tf_manage: PositionsManager):
         super().__init__("agent_Sbem")
         
         #create a service for interact with other module
@@ -56,12 +56,15 @@ class AgentClass(Node):
         self.responseUser = self.create_publisher(String,"/response_to_user",10)
 
         search = TavilySearchResults(max_results=2)
-        #search_results = search.invoke("what is the weather in SF")
-        #print(search_results)
+        
         # If we want, we can create other tools.
+        navCommander = NavigatorCommander(tf_manage)
+        savePositionTool = SavePosition(tf_manage)
+        moveTool = MoveCommander()
+        autoDockTool = AutoDockCommander()
+
         # Once we have all the tools we want, we can put them in a list that we will reference later.
-        tools = [search, tools_sbem.getsqrt,moveTool.moveCommander, savePosTool.savePosCommander , autoDockTool.DockCommander,
-                  navCommandTool.NavCommander, tools_sbem.get_image ]
+        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, tools_sbem.get_image ]
 
         memory = MemorySaver()
 
@@ -118,18 +121,18 @@ def main(args=None):
     rclpy.init(args=args)
 
     #initiate the class for publishing the current pose
-    tfpub = TfEcho()
+    position_manager = PositionsManager()
 
     #initiate the class for the agent with langchain
-    agent = AgentClass()
+    agent = AgentClass(position_manager)
 
     #initiate the audio nodes
-    tts_node = tts_sbem.AudioPlayerNode(useLocalTTS=False)
-    wake_stt_node = wake_stt_sbem.ProcessAudio()
+    tts_node = AudioPlayerNode(useLocalTTS=True)
+    wake_stt_node = ProcessAudio()
 
 
     executor = MultiThreadedExecutor()
-    executor.add_node(tfpub)
+    executor.add_node(position_manager)
     executor.add_node(tts_node)
     executor.add_node(wake_stt_node)
     executor.add_node(agent)

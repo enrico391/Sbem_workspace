@@ -33,7 +33,7 @@ import audioProcess.wake_stt_sbem as wake_stt_sbem
 from custom_agent import myAgent
 
 # import TFpublisher 
-import TFpublisher
+from positionManager import PositionsManager
 
 
 if "GOOGLE_API_KEY" not in os.environ:
@@ -44,7 +44,7 @@ if "GOOGLE_API_KEY" not in os.environ:
 
 class AgentClass(Node):
 
-    def __init__(self):
+    def __init__(self, positions_manager):
         super().__init__("agent_executor")
         
         #create a service for interact with other module
@@ -61,7 +61,7 @@ class AgentClass(Node):
     
 
         #create agent
-        self.agent = myAgent()
+        self.agent = myAgent(positions_manager)
 
     def print_stream(self, stream):
         for s in stream:
@@ -91,10 +91,10 @@ def main(args=None):
 
     
     #initiate the class for publishing the current pose
-    tfpub = TFpublisher.TfEcho()
+    tfpub = PositionsManager()
 
     #initiate the class for the agent with langchain
-    agent = AgentClass()
+    agent = AgentClass(tfpub)
 
 
     #initiate the audio nodes

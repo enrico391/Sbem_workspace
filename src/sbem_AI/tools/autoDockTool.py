@@ -136,7 +136,7 @@ class AutoDockCommander(BaseTool):
 
 
 # Tool for autodock actions
-DockCommander = AutoDockCommander()
+#DockCommander = AutoDockCommander()
 
 
 
