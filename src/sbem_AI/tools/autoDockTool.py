@@ -133,10 +133,3 @@ class AutoDockCommander(BaseTool):
             else:
                 print('Undock has an invalid return status!')
 
-
-
-# Tool for autodock actions
-#DockCommander = AutoDockCommander()
-
-
-

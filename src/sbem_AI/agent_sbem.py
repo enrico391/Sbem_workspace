@@ -20,18 +20,18 @@ from rclpy.node import Node
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
 from std_msgs.msg import String
-from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 
 
 #tools imports
 import tools.sbem_tools as tools_sbem
 from tools.navigatorTool import NavigatorCommander
 from tools.autoDockTool import AutoDockCommander
-from tools.MoveTool import MoveCommander
+from tools.moveTool import MoveCommander
 from tools.savePositionTool import SavePosition
+from tools.imageRecognitionTool import ImageRecognition
+
 from positionManager import PositionsManager
-
-
+from tools.imageSub import ImageSubscriber
 
 #audio imports files
 from audioProcess.tts_sbem import AudioPlayerNode
@@ -47,7 +47,7 @@ if "GOOGLE_API_KEY" not in os.environ:
 
 class AgentClass(Node):
 
-    def __init__(self, tf_manage: PositionsManager):
+    def __init__(self, tf_manager: PositionsManager, image_manager: ImageSubscriber):
         super().__init__("agent_Sbem")
         
         #create a service for interact with other module
@@ -58,13 +58,14 @@ class AgentClass(Node):
         search = TavilySearchResults(max_results=2)
         
         # If we want, we can create other tools.
-        navCommander = NavigatorCommander(tf_manage)
-        savePositionTool = SavePosition(tf_manage)
+        navCommander = NavigatorCommander(tf_manager)
+        savePositionTool = SavePosition(tf_manager)
         moveTool = MoveCommander()
         autoDockTool = AutoDockCommander()
+        imageRecognitionTool = ImageRecognition(image_manager)
 
         # Once we have all the tools we want, we can put them in a list that we will reference later.
-        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, tools_sbem.get_image ]
+        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, imageRecognitionTool ]
 
         memory = MemorySaver()
 
@@ -89,10 +90,10 @@ class AgentClass(Node):
                     temperature=0,          
                 )
     
-        
         #create agent
         self.agent_executor = create_react_agent(model, tools, prompt=prompt, checkpointer=memory)
         self.config = {"configurable": {"thread_id": "abc1333"}}
+
 
     def print_stream(self, stream):
         for s in stream:
@@ -108,6 +109,7 @@ class AgentClass(Node):
                     resp.data = message.content
                     self.responseUser.publish(resp)
         
+
     def user_input_callback(self,msg):
         answer = msg.data
         inputs = {"messages": [("user", answer)]}
@@ -117,24 +119,31 @@ class AgentClass(Node):
 
     
 
+
+
 def main(args=None):
     rclpy.init(args=args)
 
-    #initiate the class for publishing the current pose
+    # node to manage all positions 
     position_manager = PositionsManager()
 
-    #initiate the class for the agent with langchain
-    agent = AgentClass(position_manager)
+     # image subscribe node
+    img_node = ImageSubscriber()
 
-    #initiate the audio nodes
-    tts_node = AudioPlayerNode(useLocalTTS=True)
+    # object for the agent with langraph
+    agent = AgentClass(position_manager, img_node)
+
+    # audio nodes
+    tts_node = AudioPlayerNode(useLocalTTS=False)
     wake_stt_node = ProcessAudio()
 
+   
 
     executor = MultiThreadedExecutor()
     executor.add_node(position_manager)
     executor.add_node(tts_node)
     executor.add_node(wake_stt_node)
+    executor.add_node(img_node)
     executor.add_node(agent)
 
 
@@ -146,13 +155,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-
-
-# while True:
-#     answer = input("Question : ")
-#     for chunk in agent_executor.stream(
-#         {"messages": [HumanMessage(content=answer)]}, config
-#     ):
-#         print(chunk)
-#         print("----")
-

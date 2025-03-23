@@ -19,6 +19,7 @@ from PIL import Image
 
 
 
+
 @tool
 def getsqrt(a: int) ->int:
     """Get the square root of a number in the input"""
@@ -27,24 +28,14 @@ def getsqrt(a: int) ->int:
 
 
 
-@tool
-def get_image() -> dict:
-    """Load an image and return it as dict """
+# @tool
+# def get_image() -> dict:
+#     """Return content in base64 format"""
 
-    imageHandler = ImageSubscriber()
-
-    imageHandler.getImage()
-
-    with open('src/sbem_AI/ggg.jpg', 'rb') as image_file:
-        image_data = base64.b64encode(image_file.read()).decode("utf-8")
-
-
-    #image_url = "src/sbem_AI/tarta.jpg"
-
-    return [
-        {"type": "text", "text": "The image is attached below in base64 format"},
-        {"type": "image_url" , "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}},
-    ]
+#     return [
+#         {"type": "text", "text": "The image is attached below in base64 format"},
+#         {"type": "image_url" , "image_url": {"url": f"data:image/jpeg;base64,{imageHandler.getImageBase64()}"}},
+#     ]
 
 
 

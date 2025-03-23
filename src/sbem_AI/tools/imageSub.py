@@ -4,7 +4,8 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
 import os
-
+import base64
+import google.generativeai as genai
 
 
 #imports for agent
@@ -16,9 +17,6 @@ from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-
-
-
 
 
 
@@ -34,31 +32,31 @@ class ImageSubscriber(Node):
 
     def image_callback(self, msg):
         try:
-            self.get_logger().info("Get image")
+            #self.get_logger().info("Get image")
 
             # Convert ROS2 Image message to OpenCV format
             self.cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+
             
-        
-
-
+            
         except Exception as e:
             self.get_logger().error(f"Failed to process image: {e}")
 
 
     #get image for tool langraph
-    def getImage(self):
+    def getImageBytes(self):
         # Save the image as a JPEG file
-        rclpy.spin_once(self)
+        #rclpy.spin_once(self)
 
-        #self.get_logger().info("Waiting for image")
+        # get the base64 format img
+        retval, buffer = cv2.imencode('.jpg', self.cv_image)
+        # jpg_as_text = base64.b64encode(buffer)
+        # contents=["What is this image?",
+        #       types.Part.from_bytes(data=buffer.tobytes(), mime_type="image/jpeg")]
         
-        image_path = "src/sbem_AI/tools/output.jpg"
-        
-        cv2.imwrite(image_path, self.cv_image)
+        return buffer.tobytes()
 
         
-
         
 
 # def main(args=None):
