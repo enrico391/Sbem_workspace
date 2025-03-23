@@ -3,7 +3,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
-
+import os
 
 
 
@@ -16,7 +16,7 @@ from langchain_core.callbacks import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-from pydantic import PrivateAttr
+
 
 
 
@@ -56,6 +56,8 @@ class ImageSubscriber(Node):
         image_path = "src/sbem_AI/tools/output.jpg"
         
         cv2.imwrite(image_path, self.cv_image)
+
+        
 
         
 

@@ -48,7 +48,7 @@ if "GOOGLE_API_KEY" not in os.environ:
 class AgentClass(Node):
 
     def __init__(self):
-        super().__init__("agent_executor")
+        super().__init__("agent_Sbem")
         
         #create a service for interact with other module
         self.inputUser = self.create_subscription(String,"/user_input",self.user_input_callback,10)
@@ -75,16 +75,16 @@ class AgentClass(Node):
              Today is {str(date.today())}
             """))
 
-        model = ChatOllama(
-            base_url="http://localhost:11434",
-            model="qwen2.5:14b",
-            temperature=0,    
-        )
+        # model = ChatOllama(
+        #     base_url="http://localhost:11434",
+        #     model="qwen2.5:14b",
+        #     temperature=0,    
+        # )
 
-        #model = ChatGoogleGenerativeAI(
-        #            model="gemini-2.0-pro-exp-02-05",
-        #            temperature=0,          
-        #        )
+        model = ChatGoogleGenerativeAI(
+                    model="gemini-2.0-pro-exp-02-05",
+                    temperature=0,          
+                )
     
         
         #create agent
