@@ -122,37 +122,13 @@
             <izz>3.97093</izz>
           </inertia>
         </inertial>
-        <collision name='base_link_fixed_joint_lump__charging_dock_collision'>
-          <pose>0.15 0 -0.03 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/charging_dock.stl</uri>
-            </mesh>
-          </geometry>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <friction>
-              <ode>
-                <mu>0.001</mu>
-                <mu2>0.001</mu2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
+        
         <collision name='base_link_fixed_joint_lump__chassis_collision_1'>
           <pose>0 -0.04 -0.075 0 -0 0</pose>
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/cover_frame_1.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/cover_frame_1.stl</uri>
             </mesh>
           </geometry>
           <surface>
@@ -218,12 +194,12 @@
           <max_contacts>10</max_contacts>
         </collision>
         <collision name='base_link_fixed_joint_lump__central_body_collision_4'>
-          <pose>-0.08 0 0.405 0 -0 0</pose>
+          <pose>-0.1 -0.04 -0.08 0 -0 0</pose>
           <geometry>
-            <cylinder>
-              <length>0.342</length>
-              <radius>0.216</radius>
-            </cylinder>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/central_body_1.stl</uri>
+            </mesh>
           </geometry>
           <surface>
             <contact>
@@ -247,7 +223,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/upper_body_1.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/upper_body_1.stl</uri>
             </mesh>
           </geometry>
           <surface>
@@ -267,31 +243,7 @@
           </surface>
           <max_contacts>10</max_contacts>
         </collision>
-        <collision name='base_link_fixed_joint_lump__dept_camera_collision_6'>
-          <pose>0.074599 0.183493 -0.225683 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/dept_camera_1.stl</uri>
-            </mesh>
-          </geometry>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <friction>
-              <ode>
-                <mu>0.2</mu>
-                <mu2>0.2</mu2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
+        
         <collision name='base_link_fixed_joint_lump__laser_frame_collision_7'>
           <pose>0.07 0 0.2 0 0 -3.14159</pose>
           <geometry>
@@ -319,7 +271,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/base_link.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/base_link.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -336,27 +288,12 @@
             </friction>
           </surface>
         </collision>
-        <visual name='base_link_fixed_joint_lump__charging_dock_visual'>
-          <pose>0.15 0 -0.03 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/charging_dock.stl</uri>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/White</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-        </visual>
         <visual name='base_link_fixed_joint_lump__chassis_visual_1'>
           <pose>-0.09 -0.04 -0.075 0 -0 0</pose>
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/cover_frame_1.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/cover_frame_1.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -409,12 +346,12 @@
           </material>
         </visual>
         <visual name='base_link_fixed_joint_lump__central_body_visual_5'>
-          <pose>-0.08 0 0.405 0 -0 0</pose>
+          <pose>-0.1 -0.04 -0.08 0 -0 0</pose>
           <geometry>
-            <cylinder>
-              <length>0.342</length>
-              <radius>0.216</radius>
-            </cylinder>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/central_body_1.stl</uri>
+            </mesh>
           </geometry>
           <material>
             <script>
@@ -428,7 +365,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/upper_body_1.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/upper_body_1.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -438,21 +375,7 @@
             </script>
           </material>
         </visual>
-        <visual name='base_link_fixed_joint_lump__dept_camera_visual_7'>
-          <pose>0.074599 0.183493 -0.225683 0 -0 0</pose>
-          <geometry>
-            <mesh>
-              <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/dept_camera_1.stl</uri>
-            </mesh>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/White</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-        </visual>
+        
         <visual name='base_link_fixed_joint_lump__laser_frame_visual_8'>
           <pose>0.07 0 0.2 0 0 -3.14159</pose>
           <geometry>
@@ -473,7 +396,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>file:///home/morolinux/Documents/sbem_project_ws/install/robot_sbem/share/robot_sbem/description/meshes/base_link.stl</uri>
+              <uri>file:///home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/meshes/base_link.stl</uri>
             </mesh>
           </geometry>
         </visual>
@@ -535,7 +458,7 @@
             <output_type>sensor_msgs/LaserScan</output_type>
             <frame_name>laser_frame</frame_name>
           </plugin>
-          <pose>0.07 0 0.2 0 0 -3.14159</pose>
+          <pose>0.07 0 0.21 0 0 -3.14159</pose>
         </sensor>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>

@@ -31,7 +31,7 @@ docking_server:
       filter_coef: 0.1
 
     # Sep. file of dock instances so config file can be used in multiple locations
-    dock_database: /home/morolinux/Documents/sbem_project_ws/src/robot_sbem/config/dock_database.yaml
+    dock_database: /home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/config/dock_database.yaml
 
     controller:
       k_phi: 3.0

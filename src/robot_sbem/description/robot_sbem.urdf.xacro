@@ -48,8 +48,8 @@
     </visual>
     <collision>
         <origin xyz="0.10 -0.04 -0.075"/>
-        <geometry>
-            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <geometry> 
+            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>  
         </geometry> 
     </collision>
     <inertial>
