@@ -38,7 +38,7 @@ class AutoDockInput(BaseModel):
 
 class AutoDockCommander(BaseTool):
     name: str = "Autodock_Commander"
-    description: str = "Useful to make dock and undock actions"
+    description: str = "Use it for recharging the robot. It can dock or undock the robot. The output is a string with the result of the action."
     args_schema: Type[BaseModel] = AutoDockInput
     #return_direct: bool = True
 
@@ -70,13 +70,13 @@ class AutoDockCommander(BaseTool):
             # dock_pose.pose.orientation.w = 0.27678445943162139
 
             #coordinates for the dock gazebo
-            dock_pose.pose.position.x = -0.23
-            dock_pose.pose.position.y = 9.762020221672746
+            dock_pose.pose.position.x = -4.28
+            dock_pose.pose.position.y = -10.6
             dock_pose.pose.position.z = 0.0
             dock_pose.pose.orientation.x = 0.0
             dock_pose.pose.orientation.y = 0.0
-            dock_pose.pose.orientation.z = 0.7399855606493145
-            dock_pose.pose.orientation.w = 0.6726227546153352
+            dock_pose.pose.orientation.z = 0.77
+            dock_pose.pose.orientation.w = 0.64
             
 
             self._tester.dockRobot(dock_pose)

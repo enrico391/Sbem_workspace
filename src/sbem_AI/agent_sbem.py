@@ -20,6 +20,7 @@ from rclpy.node import Node
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
 from std_msgs.msg import String
+from std_msgs.msg import Bool
 
 
 #tools imports
@@ -50,10 +51,14 @@ class AgentClass(Node):
     def __init__(self, tf_manager: PositionsManager, image_manager: ImageSubscriber):
         super().__init__("agent_Sbem")
         
-        #create a service for interact with other module
+        # get the answer from the user
         self.inputUser = self.create_subscription(String,"/user_input",self.user_input_callback,10)
-
+        
+        # publish text response to app user and tts
         self.responseUser = self.create_publisher(String,"/response_to_user",10)
+
+        # for app animation
+        self.pub_startAnswer = self.create_publisher(Bool, "/start_answer", 10)
 
         search = TavilySearchResults(max_results=2)
         
@@ -73,9 +78,8 @@ class AgentClass(Node):
              You are SBEM a differential robot type with the ability to move in the house using your tools.
              You can save positions if required or navigate to the web to find useful informations for the user.
              You can see the word and use you tool to manage what you see.
-             You can also dock to recharge your battery. You MUST required all the actions that you wants to do.
-             You need to response with a simple sentence. You can talk in italian if the user wants to talk in italian.
-             You MUST send a message to the user before the usage of tools and one after the usage of tools.
+             You can also recharge your battery using your specific tool.
+             You need to response with a simple sentence that give a feedback to the user. You can talk in italian if the user wants to talk in italian.
              Today is {str(date.today())}
             """))
 
@@ -107,7 +111,12 @@ class AgentClass(Node):
                 if(message.type == 'ai'):
                     resp = String()
                     resp.data = message.content
+
+                    # publish the response to the user
                     self.responseUser.publish(resp)
+                    
+                    # start flag for animation on the app
+                    #self.pub_startAnswer.publish(Bool(data=True))
         
 
     def user_input_callback(self,msg):

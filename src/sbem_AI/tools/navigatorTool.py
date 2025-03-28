@@ -27,7 +27,8 @@ from positionManager import PositionsManager
 
 #Tool for nav to pose
 class NavigatorInput(BaseModel):
-    coord: dict = Field(description="This is necessary to go in a specific position, dict of 2 position in x, y and 2 orientations in w and z coordinates for the final pose, the number MUST be float type, set all to 0.0 if you use the namePos")
+    x_pos: float = Field(description="This is the X coordinate for navigation, set to 0.0 if you use the namePos")
+    y_pos: float = Field(description="This is the Y coordinate for navigation, set to 0.0 if you use the namePos")
     namePos: str = Field(description="the appropriate name of the position or leaves blank if you don't know")
     
 class NavigatorCommander(BaseTool):
@@ -43,7 +44,7 @@ class NavigatorCommander(BaseTool):
         super().__init__()
         self._tf_manage = tf_manage
 
-    def _run(self, coord: dict, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+    def _run(self, x_pos: float, y_pos: float, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         
         if(namePos != ""):
             coord = self._tf_manage.return_position().get(namePos)
@@ -57,8 +58,8 @@ class NavigatorCommander(BaseTool):
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
         goal_pose.header.stamp = self._navigator.get_clock().now().to_msg()
-        goal_pose.pose.position.x = float(coord["x"])
-        goal_pose.pose.position.y = float(coord["y"])
+        goal_pose.pose.position.x = float(x_pos)
+        goal_pose.pose.position.y = float(y_pos)
         goal_pose.pose.orientation.w = 0.0 #float(coord["w"])
         goal_pose.pose.orientation.z = 1.0 #float(coord["z"])
 

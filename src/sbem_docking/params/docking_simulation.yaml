@@ -4,7 +4,7 @@ docking_server:
     initial_perception_timeout: 5.0
     wait_charge_timeout: 7.0
     dock_approach_timeout: 50.0
-    undock_linear_tolerance: 0.05
+    undock_linear_tolerance: 0.10
     undock_angular_tolerance: 0.1
     max_retries: 3
     base_frame: "base_link"
@@ -26,7 +26,7 @@ docking_server:
 
       #offset from apriltag
       external_detection_timeout: 30.0
-      external_detection_translation_x: -0.10
+      external_detection_translation_x: -0.15
       external_detection_translation_y: 0.0
       external_detection_rotation_roll:  0.0
       external_detection_rotation_pitch:  0.0

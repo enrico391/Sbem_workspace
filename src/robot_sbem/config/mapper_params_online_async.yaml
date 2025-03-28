@@ -19,9 +19,9 @@ slam_toolbox:
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given  /home/morolinux/Documents/sbem_project_ws/map_primopiano_complete_serial.data
     # will use pose
-    map_file_name: src/robot_sbem/maps/map_gazebo_april.data
-    # map_start_pose: [0.0, 0.0, 0.0]
-    map_start_at_dock: true
+    # map_file_name: /home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/maps/map_primopiano_complete_serial.data
+    # # map_start_pose: [0.0, 0.0, 0.0]
+    # map_start_at_dock: true
 
     debug_logging: false
     throttle_scans: 1

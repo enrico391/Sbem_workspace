@@ -178,7 +178,7 @@ class ProcessAudio(Node):
             self.start_record = True
 
             #publish over topic that publishes start answer message for sbem APP 
-            self.pub_startAnswer.publish(Bool(data=True))
+            #self.pub_startAnswer.publish(Bool(data=True))
 
             self.get_logger().info(f"Recording....")
 
