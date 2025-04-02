@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 
 
-#PART of the script come from audio_player_node.py of :
-# authors:
-#   - family-names: "González-Santamarta"
-#     given-names: "Miguel Á."
-# title: "audio_common"
-# date-released: 2023-05-06
-# url: "https://github.com/mgonzs13/audio_common"
-
 import rclpy
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
@@ -43,6 +35,8 @@ CHANNELS = 1
 RATE = 16000
 swidth = 2
 CHUNK = 1280
+WAKE_WORD_THRESHOLD = 0.5
+RMS_THRESHOLD = 30
 
 openwakeword.utils.download_models()
 
@@ -52,19 +46,22 @@ class ProcessAudio(Node):
         super().__init__("processAudio")
         self.nodename = "processAudio"
         
-
-        
         self.model = WhisperModel("large-v3", device="cuda", compute_type="float16")
 
-        self.model_wake_word = Model(wakeword_models=["/home/morolinux/Projects/Sbem/sbem_project_ws/src/sbem_AI/audioProcess/spem_v2.tflite"],inference_framework="tflite")
+        model_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "audioProcess/spem_v2.tflite"
+        )
 
-        
+        self.model_wake_word = Model(wakeword_models=[model_path],inference_framework="tflite")
 
         self.start_record = False
         self.audio = pyaudio.PyAudio()
         self.stream_dict = {}
         self.data_audio = None
-        self.f_name_directory = r"/home/morolinux/Projects/Sbem/sbem_project_ws/src/sbem_AI/audioProcess/samples"
+        self.current = 0
+        self.rec = []
+        self.end = 0
 
         self.declare_parameters("", [
             ("channels", 1),
@@ -86,28 +83,48 @@ class ProcessAudio(Node):
         self.pub_tts = self.create_publisher(String, "/user_input", 10)
 
         # for app animation
-        self.pub_startAnswer = self.create_publisher(Bool, "/start_answer", 10)
+        self.pub_startAnswer = self.create_publisher(Bool, "/start_listening", 10)
 
         self.get_logger().info(f"-I- {self.nodename} started")
 
 
+    # function to handle stream setup
+    def handle_stream_setup(self, msg):
+        
+        stream_key = f"{msg.audio.info.format}_{msg.audio.info.rate}_{self.channels}"
+
+        if stream_key not in self.stream_dict:
+            self.stream_dict[stream_key] = self.audio.open(
+                format=msg.audio.info.format,
+                channels=self.channels,
+                rate=msg.audio.info.rate,
+                output=True,
+                output_device_index=self.device
+            )
+        
+        return stream_key
 
 
-    # create wav sound and store in file 
-    def write(self, recording):
-        #n_files = len(os.listdir(self.f_name_directory))
+    # function to process audio data
+    def process_audio_data(self, msg):
+        
+        array_data = msg_to_array(msg.audio)
 
-        #filename = os.path.join(self.f_name_directory, '{}.wav'.format(n_files))
-        filename = os.path.join(self.f_name_directory, 'audio.wav')
+        if array_data is None:
+            self.get_logger().error(f"Format {msg.audio.info.format} unknown")
+            return None
 
-        wf = wave.open(filename, 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(self.audio.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(recording)
-        wf.close()
-        print('Written to file: {}'.format(filename))
-        print('Returning to listening')
+        # Channel conversion if needed
+        if msg.audio.info.channels != self.channels:
+            if msg.audio.info.channels == 1 and self.channels == 2:
+                # mono to stereo
+                array_data = np.repeat(array_data, 2)
+            elif msg.audio.info.channels == 2 and self.channels == 1:
+                # stereo to mono
+                array_data = np.mean(array_data.reshape(-1, 2), axis=1)
+                array_data = array_data.astype(pyaudio_to_np[msg.audio.info.format])
+
+        return array_to_data(array_data)
 
 
     #function to detect sound power
@@ -124,42 +141,84 @@ class ProcessAudio(Node):
 
         return rms * 1000
 
+    # function to start recording
+    def start_recording(self):
+        self.start_record = True
+        self.pub_startAnswer.publish(Bool(data=True))
+        self.get_logger().info("Recording started...")
+        
+        # Initialize recording variables
+        self.rec = []
+        current_time = self.get_clock().now().seconds_nanoseconds()[0]
+        self.current_time = current_time
+        self.end = current_time + TIMEOUT_LENGTH
+
+
+    # function to view if sound is active
+    def process_recording(self, audio_data):
+       
+        # Check if sound is still active
+        if self.rms(audio_data) >= RMS_THRESHOLD:
+            self.end = self.get_clock().now().seconds_nanoseconds()[0] + TIMEOUT_LENGTH
+        
+        # Update current time
+        self.current = self.get_clock().now().seconds_nanoseconds()[0]
+        
+        # Add audio data to recording
+        self.rec.append(audio_data)
+
+
+    # function that store the audio in a file and clear the variables
+    def finish_recording(self):
+        
+        if self.rec:  # Check if there is any recorded audio
+            audio_data = b''.join(self.rec)
+            # transcribe the audio
+            self.transcribe_from_memory(audio_data)
+            self.rec = []  # Clear the buffer
+        
+        self.start_record = False
+        self.pub_startAnswer.publish(Bool(data=False))
+        self.get_logger().info("Recording finished")
+
+
+    # function to transcribe the audio from the buffer
+    def transcribe_from_memory(self, audio_data):
+        try:
+            # Convert audio bytes to numpy array
+            audio_np = np.frombuffer(audio_data, dtype=np.int16)
+            
+            # Audio needs to be normalized to float32 in range [-1, 1]
+            audio_float = audio_np.astype(np.float32) / 32768.0
+            
+            # Transcribe directly from the numpy array
+            segments, _ = self.model.transcribe(audio_float, beam_size=5)
+            
+            for segment in segments:
+                transcript = segment.text
+                self.get_logger().info(f"[{segment.start:.2f}s -> {segment.end:.2f}s] {transcript}")
+                
+                # Publish transcript
+                msg_text = String()
+                msg_text.data = transcript
+                self.pub_tts.publish(msg_text)
+                
+            return True
+        except Exception as e:
+            self.get_logger().error(f"Error transcribing: {e}")
+            return False
+
 
     #main function 
     def get_audio(self, msg : AudioStamped) -> None:
-        #get stream key from msg
-        stream_key = f"{msg.audio.info.format}_{msg.audio.info.rate}_{self.channels}"
+        self.handle_stream_setup(msg)
 
-        if stream_key not in self.stream_dict:
-            self.stream_dict[stream_key] = self.audio.open(
-                format=msg.audio.info.format,
-                channels=self.channels,
-                rate=msg.audio.info.rate,
-                output=True,
-                output_device_index=self.device
-            )
 
         #convert audio from msg
-        array_data = msg_to_array(msg.audio)
-
-        if array_data is None:
-            self.get_logger().error(f"Format {msg.audio.info.format} unknown")
+        self.data_audio = self.process_audio_data(msg)
+        if self.data_audio is None:
             return
 
-        if msg.audio.info.channels != self.channels:
-            if msg.audio.info.channels == 1 and self.channels == 2:
-                # mono to stereo
-                array_data = np.repeat(array_data, 2)
-
-            elif msg.audio.info.channels == 2 and self.channels == 1:
-                # stereo to mono
-                array_data = np.mean(array_data.reshape(-1, 2), axis=1)
-                array_data = array_data.astype(
-                    pyaudio_to_np[msg.audio.info.format])
-
-
-        #convert audio in chunk
-        self.data_audio = array_to_data(array_data)
         
         #calculate prediction wake word
         prediction = self.model_wake_word.predict(np.frombuffer(self.data_audio, dtype=np.int16))
@@ -168,85 +227,16 @@ class ProcessAudio(Node):
         scores = list(self.model_wake_word.prediction_buffer["spem_v2"])
         curr_score = format(scores[-1], '.20f').replace("-", "")
 
-
-        #print("Score wake word : ", curr_score)
-        #print("Rms value : ", self.rms(self.data_audio))
-
         
         #check is score for wake word is high and flag is ok and start recording
-        if float(curr_score) > 0.5 and self.start_record == False:
-            self.start_record = True
-
-            #publish over topic that publishes start answer message for sbem APP 
-            #self.pub_startAnswer.publish(Bool(data=True))
-
-            self.get_logger().info(f"Recording....")
-
-            #initialize variables 
-            self.rec = []
-            self.current = self.get_clock().now().seconds_nanoseconds()[0]
-            self.end = self.get_clock().now().seconds_nanoseconds()[0] + TIMEOUT_LENGTH
+        if float(curr_score) > WAKE_WORD_THRESHOLD and self.start_record == False:
+            self.start_recording()
         
 
-        if self.start_record and self.current <= self.end :
-            #check if command is finished or end of timer
-            if self.rms(self.data_audio) >= 30: self.end = self.get_clock().now().seconds_nanoseconds()[0] + TIMEOUT_LENGTH
-
-            #update current variable
-            self.current = self.get_clock().now().seconds_nanoseconds()[0]
-
-
-            #append dato to file audio
-            self.rec.append(self.data_audio)
-
-        #if command voice is finished store and create file audio and reset variables
-        else :
-            if self.start_record:
-                self.write(b''.join(self.rec))
-                self.start_record = False
-                self.pub_startAnswer.publish(Bool(data=False))
+        if self.start_record:
+            if self.current <= self.end :
+                self.process_recording(self.data_audio)
+            else : #if command voice is finished store and create file audio and reset variables
+                self.finish_recording()
         
 
-        #if there is the file wav perform transcribe with faster whisper 
-        if os.path.isfile(os.path.join(self.f_name_directory, 'audio.wav')):
-            self.get_logger().info("Audio file available")
-            segments, info = self.model.transcribe(os.path.join(self.f_name_directory, 'audio.wav'), beam_size=5)
-
-            
-            for segment in segments:
-                print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
-  
-                #publish over topic that publishes transcribe message
-                msg_text = String()
-                msg_text.data = segment.text
-                self.pub_tts.publish(msg_text)
-
-            os.remove(os.path.join(self.f_name_directory, 'audio.wav'))
-
-
-    
-
-
-    # def destroy_node(self) -> bool:
-    #     for key in self.stream_dict:
-    #         self.stream_dict[key].close()
-    #     self.audio.terminate()
-    #     os.remove(os.path.join(self.f_name_directory, 'audio.wav'))
-    #     return super().destroy_node()
-        
-
-
-# def main(args=None):
-#     rclpy.init(args=args)
-#     try:
-#         process_audio_sbem = ProcessAudio()
-#         rclpy.spin(process_audio_sbem)
-#     except rclpy.exceptions.ROSInterruptException:
-#         pass
-
-#     process_audio_sbem.destroy_node()
-#     rclpy.shutdown()
-
-
-# if __name__ == '__main__':
-#     main()
