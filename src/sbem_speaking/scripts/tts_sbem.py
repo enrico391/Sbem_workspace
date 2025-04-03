@@ -29,10 +29,8 @@ class AudioPlayerNode(Node):
 
         self.audio = pyaudio.PyAudio()
 
-        qos_profile = qos_profile_sensor_data
-
         self.sub = self.create_subscription(
-            String, "/response_to_user", self.audio_callback, qos_profile)
+            String, "/response_to_user", self.audio_callback, qos_profile_sensor_data)
 
         self.get_logger().info("AudioPlayer sbem node started")
 

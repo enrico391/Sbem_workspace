@@ -27,20 +27,5 @@ def getsqrt(a: int) ->int:
 
 
 
-
-# @tool
-# def get_image() -> dict:
-#     """Return content in base64 format"""
-
-#     return [
-#         {"type": "text", "text": "The image is attached below in base64 format"},
-#         {"type": "image_url" , "image_url": {"url": f"data:image/jpeg;base64,{imageHandler.getImageBase64()}"}},
-#     ]
-
-
-
-
-
-
     
 

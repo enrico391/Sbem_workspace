@@ -14,14 +14,14 @@ from positionManager import PositionsManager
 
 
 #Tool for nav to pose
-class SavePosInput(BaseModel):
+class GetPosInput(BaseModel):
     namePos: str = Field(description="the appropriate name for the stored position")
     
     
-class SavePosition(BaseTool):
-    name: str = "Save_position"
-    description: str = "Useful to store the current position"
-    args_schema: Type[BaseModel] = SavePosInput
+class GetPosition(BaseTool):
+    name: str = "Get_position"
+    description: str = "Useful to get coordinates of a stored position. You must insert the name of the position you want to get"
+    args_schema: Type[BaseModel] = GetPosInput
     #return_direct: bool = True
     _tf_manage: PositionsManager = PrivateAttr()
     
@@ -32,12 +32,10 @@ class SavePosition(BaseTool):
         
 
     def _run(self, namePos: str, run_manager: Optional[CallbackManagerForToolRun] = None)-> str:
-        #store current position in the list
         if(namePos == ""):
-            return "You must insert a name for the position that you want to store"
+            return "You must insert a name for the position"
         else:
-            #get current pose from tf manager
-            pose = self._tf_manage.return_current_pose()
-            # add position
-            self._tf_manage.update_position(namePos, pose)
-            return "The position is stored successfully"
+            if(namePos in self._tf_manage.return_position()):
+                return self._tf_manage.return_position().get(namePos)
+            else:
+                return "The position is not stored"

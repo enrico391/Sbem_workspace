@@ -33,8 +33,6 @@ TIMEOUT_LENGTH = 3
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
-swidth = 2
-CHUNK = 1280
 WAKE_WORD_THRESHOLD = 0.5
 RMS_THRESHOLD = 30
 
@@ -88,9 +86,8 @@ class ProcessAudio(Node):
         self.get_logger().info(f"-I- {self.nodename} started")
 
 
-    # function to handle stream setup
     def handle_stream_setup(self, msg):
-        
+        """Handle stream setup for audio data"""
         stream_key = f"{msg.audio.info.format}_{msg.audio.info.rate}_{self.channels}"
 
         if stream_key not in self.stream_dict:
@@ -105,9 +102,8 @@ class ProcessAudio(Node):
         return stream_key
 
 
-    # function to process audio data
     def process_audio_data(self, msg):
-        
+        """Transform msg dato from topic in audio data"""
         array_data = msg_to_array(msg.audio)
 
         if array_data is None:
@@ -127,8 +123,8 @@ class ProcessAudio(Node):
         return array_to_data(array_data)
 
 
-    #function to detect sound power
     def rms(self, frame):
+        """Calculate rms of audio data"""
         count = len(frame) / 2
         format = "%dh" % (count)
         shorts = struct.unpack(format, frame)
@@ -141,8 +137,9 @@ class ProcessAudio(Node):
 
         return rms * 1000
 
-    # function to start recording
+
     def start_recording(self):
+        """Start record audio"""
         self.start_record = True
         self.pub_startAnswer.publish(Bool(data=True))
         self.get_logger().info("Recording started...")
@@ -154,9 +151,8 @@ class ProcessAudio(Node):
         self.end = current_time + TIMEOUT_LENGTH
 
 
-    # function to view if sound is active
     def process_recording(self, audio_data):
-       
+        """Function to check if sound is active and store audio data"""
         # Check if sound is still active
         if self.rms(audio_data) >= RMS_THRESHOLD:
             self.end = self.get_clock().now().seconds_nanoseconds()[0] + TIMEOUT_LENGTH
@@ -168,9 +164,8 @@ class ProcessAudio(Node):
         self.rec.append(audio_data)
 
 
-    # function that store the audio in a file and clear the variables
     def finish_recording(self):
-        
+        """Function to finish recording and process the audio data"""
         if self.rec:  # Check if there is any recorded audio
             audio_data = b''.join(self.rec)
             # transcribe the audio
@@ -182,8 +177,8 @@ class ProcessAudio(Node):
         self.get_logger().info("Recording finished")
 
 
-    # function to transcribe the audio from the buffer
     def transcribe_from_memory(self, audio_data):
+        """Transcribe audio data from memory and publish the result over ROS topic"""
         try:
             # Convert audio bytes to numpy array
             audio_np = np.frombuffer(audio_data, dtype=np.int16)
@@ -204,21 +199,20 @@ class ProcessAudio(Node):
                 self.pub_tts.publish(msg_text)
                 
             return True
+        
         except Exception as e:
             self.get_logger().error(f"Error transcribing: {e}")
             return False
 
 
-    #main function 
     def get_audio(self, msg : AudioStamped) -> None:
+        """Callback function to process incoming audio messages"""
         self.handle_stream_setup(msg)
-
 
         #convert audio from msg
         self.data_audio = self.process_audio_data(msg)
         if self.data_audio is None:
             return
-
         
         #calculate prediction wake word
         prediction = self.model_wake_word.predict(np.frombuffer(self.data_audio, dtype=np.int16))
@@ -227,12 +221,10 @@ class ProcessAudio(Node):
         scores = list(self.model_wake_word.prediction_buffer["spem_v2"])
         curr_score = format(scores[-1], '.20f').replace("-", "")
 
-        
         #check is score for wake word is high and flag is ok and start recording
         if float(curr_score) > WAKE_WORD_THRESHOLD and self.start_record == False:
             self.start_recording()
         
-
         if self.start_record:
             if self.current <= self.end :
                 self.process_recording(self.data_audio)

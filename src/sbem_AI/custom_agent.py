@@ -47,9 +47,6 @@ class myAgent():
         tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, tools_sbem.get_image ]
         
         
-        
-
-
         prompt = ("You are SBEM a differential robot type with the ability to move in the house using your tools. " +
                     "You can save positions if required or navigate to the web to find useful informations for the user. " +
                     "You can see the word and use you tool to manage what you see. " +

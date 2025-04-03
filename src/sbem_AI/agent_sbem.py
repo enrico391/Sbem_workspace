@@ -30,6 +30,7 @@ from tools.autoDockTool import AutoDockCommander
 from tools.moveTool import MoveCommander
 from tools.savePositionTool import SavePosition
 from tools.imageRecognitionTool import ImageRecognition
+from tools.getPositionTool import GetPosition
 
 from positionManager import PositionsManager
 from tools.imageSub import ImageSubscriber
@@ -65,23 +66,50 @@ class AgentClass(Node):
         # If we want, we can create other tools.
         navCommander = NavigatorCommander(tf_manager)
         savePositionTool = SavePosition(tf_manager)
+        getPositionTool = GetPosition(tf_manager)
         moveTool = MoveCommander()
         autoDockTool = AutoDockCommander()
         imageRecognitionTool = ImageRecognition(image_manager)
+        
 
         # Once we have all the tools we want, we can put them in a list that we will reference later.
-        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, autoDockTool, navCommander, imageRecognitionTool ]
+        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, getPositionTool, autoDockTool, navCommander, imageRecognitionTool ]
 
         memory = MemorySaver()
 
+        print(tools)
+
         prompt = SystemMessage(content=(f"""
-             You are SBEM a differential robot type with the ability to move in the house using your tools.
-             You can save positions if required or navigate to the web to find useful informations for the user.
-             You can see the word and use you tool to manage what you see.
-             You can also recharge your battery using your specific tool.
-             You need to response with a simple sentence that give a feedback to the user. You can talk in italian if the user wants to talk in italian.
-             Today is {str(date.today())}
-            """))
+            You are SBEM, an advanced differential robot designed to assist users in their home environment.
+            
+            Your capabilities include:
+            - Moving around the house autonomously using navigation tools
+            - Saving and returning to specific locations when requested
+            - Searching the web for information to answer user questions
+            - Visual recognition to identify objects and people through your camera
+            - Self-maintenance like returning to your charging dock when needed
+            
+            Communication guidelines:
+            - Respond with concise, helpful sentences
+            - Adapt your language to match the user (respond in Italian if the user speaks Italian)
+            - Always confirm when you've completed a task or if you need more information
+            - Be friendly but efficient in your responses
+                                        
+            Your tools:
+            -AutoDockCommander: use it to go to the docking station for battery charging.
+            -NavigatorCommander: use it to navigate around the house, you need to provide the name of the position or the coordinates.
+            -SavePosition: use it to save a position in the house, you need to provide the name of the position.
+            -GetPosition: use it to get the coordinates of a position in the house, you need to provide the name of the stored position.
+            -MoveCommander: use it to move to a specific position
+            -ImageRecognition: use it to recognize objects and people in the house
+            -TavilySearchResults: use it to search the web for information
+            -GetSqrt: use it to calculate the square root of a number
+            
+            Current date: {str(date.today())}
+            
+            Remember to use your tools appropriately for each request rather than simulating actions.
+            DON'T SEND DUPLICATE RESPONSES TO THE USER AND DON'T USE SYMBOL * IN THE SENTENCES.
+        """))
 
         # model = ChatOllama(
         #     base_url="http://localhost:11434",
@@ -100,6 +128,7 @@ class AgentClass(Node):
 
 
     def print_stream(self, stream):
+        """Print the stream of messages from the agent"""
         for s in stream:
             message = s["messages"][-1]
             if isinstance(message, tuple):
@@ -120,6 +149,7 @@ class AgentClass(Node):
         
 
     def user_input_callback(self,msg):
+        """Callback function to get the answer from the user"""
         answer = msg.data
         inputs = {"messages": [("user", answer)]}
         response = self.agent_executor.stream(inputs,config=self.config, stream_mode="values")
@@ -127,8 +157,6 @@ class AgentClass(Node):
         self.print_stream(response)
 
     
-
-
 
 def main(args=None):
     rclpy.init(args=args)
@@ -143,10 +171,9 @@ def main(args=None):
     agent = AgentClass(position_manager, img_node)
 
     # audio nodes
-    tts_node = AudioPlayerNode(useLocalTTS=False)
+    tts_node = AudioPlayerNode(useLocalTTS=False,typeLocalTTS="coqui")
     wake_stt_node = ProcessAudio()
 
-   
 
     executor = MultiThreadedExecutor()
     executor.add_node(position_manager)
@@ -154,7 +181,6 @@ def main(args=None):
     executor.add_node(wake_stt_node)
     executor.add_node(img_node)
     executor.add_node(agent)
-
 
     executor.spin()
     executor.destroy_node()

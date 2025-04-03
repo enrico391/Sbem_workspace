@@ -6,6 +6,7 @@ import requests
 
 
 class SenderTTS:
+    """Class to manage local request to TTS server"""
     def __init__(self, typeTTS):
         
         self.typeTTS = typeTTS
@@ -18,8 +19,9 @@ class SenderTTS:
             print("Error: TTS type not supported")
             self.urlTTS = None
     
-    def sendRequest(self, textToSpeak, urlSave="output.wav"):
 
+    def sendRequest(self, textToSpeak):
+        """"Sends a request to the TTS server and returns the audio content"""
         # define parameters for the request based on the TTS type
         if(self.typeTTS == "coqui"):
             params = {
@@ -38,18 +40,13 @@ class SenderTTS:
             
             # Check if the request was successful
             if response.status_code == 200:
-                print("Audio content received")
-                # Save the audio content to a file
-                with open("output.wav", "wb") as f:
-                    f.write(response.content)
-                print("Audio file saved as output.wav")
+                return response.content
             else:
                 print(f"Failed to get audio. Status code: {response.status_code}")
                 print("Response:", response.text)
-            
-            return response.content
+                return None
         
         except requests.exceptions.RequestException as e:
             print("An error occurred:", e)
-        
+            return None
         

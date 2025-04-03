@@ -17,115 +17,88 @@ from rclpy.qos import qos_profile_sensor_data
 
 
 class AudioPlayerNode(Node):
-
-    def __init__(self, useLocalTTS= False) -> None:
+    """Node to play audio response from agent"""
+    def __init__(self, useLocalTTS= False, typeLocalTTS="coqui") -> None:
         super().__init__("tts_sbem")
-
 
         #check if use local TTS and initialize the class
         self.useLocalTTS = useLocalTTS
         if(self.useLocalTTS):
-            self.requestTTS = SenderTTS("coqui")
-
-
-        self.declare_parameters("", [
-            ("channels", 2),
-            ("device", -1),
-        ])
+            self.requestTTS = SenderTTS(typeLocalTTS)
         
-        self.length_speed = 1
-
-
         self.audio = pyaudio.PyAudio()
 
-        qos_profile = qos_profile_sensor_data
+        self.declare_parameters("", [
+            ("channels", 1),
+            ("device", -1),
+        ])
 
         self.sub = self.create_subscription(
-            String, "/response_to_user", self.audio_callback, qos_profile)
+            String, "/response_to_user", self.audio_callback, qos_profile_sensor_data)
 
         self.get_logger().info("AudioPlayer sbem node started")
 
     def destroy_node(self) -> bool:
         self.audio.terminate()
         return super().destroy_node()
+    
+
+    def play_audio(self, content, format):
+        """Function to play audio data"""
+        # Convert the audio data to an AudioSegment
+        audio = AudioSegment.from_file(BytesIO(content), format=format)
+        
+        # Extract audio properties
+        raw_data = audio.raw_data
+        sample_width = audio.sample_width
+        channels = audio.channels
+        frame_rate = audio.frame_rate
+        
+        # Create and configure audio stream
+        stream = self.audio.open(
+            format=self.audio.get_format_from_width(sample_width),
+            channels=channels,
+            rate=frame_rate,
+            output=True
+        )
+        
+        # Play audio in chunks
+        chunk_size = 1024
+        for i in range(0, len(raw_data), chunk_size):
+            stream.write(raw_data[i:i+chunk_size])
+        
+        # Clean stream
+        stream.stop_stream()
+        stream.close()
+        #self.audio.terminate()
+
 
     def audio_callback(self, msg: String) -> None:
+        """callback for subscriber to string response from agent"""
         if(msg.data != ""):
-            
-             #send request to piper server for transcribe or publish over topic
-            if self.useLocalTTS :
-                # send request and save a file named output.wav
-                self.requestTTS.sendRequest(msg.data)
-
-                chunk = 1024
-
-                try:
-                    wf = wave.open("output.wav", 'rb')
+            #send request to piper server for transcribe or publish over topic
+            if self.useLocalTTS:
+                # send local request and get content directly
+                content = self.requestTTS.sendRequest(msg.data)
                 
-
-
-                    # create an audio object
-                    p = pyaudio.PyAudio()
-
-                    # open stream based on the wave object which has been input.
-                    stream = p.open(format =
-                                    p.get_format_from_width(wf.getsampwidth()),
-                                    channels = wf.getnchannels(),
-                                    rate = wf.getframerate(),
-                                    output = True)
-
-                    # read data (based on the chunk size)
-                    data = wf.readframes(chunk)
-
-                    # play stream (looping from beginning of file to the end)
-                    while data:
-                        # writing to the stream is what *actually* plays the sound.
-                        stream.write(data)
-                        data = wf.readframes(chunk)
-
-                    # cleanup stuff.
-                    wf.close()
-                    stream.close()    
-                    p.terminate()
+                try:
+                    self.play_audio(content,"wav")
                     
-                except FileNotFoundError:
-                    self.get_logger().error("File not found")
+                except Exception as e:
+                    self.get_logger().error(f"Error playing local TTS content: {str(e)}")
 
             # or use gTTS
             else:
-                tts = gTTS(text=msg.data, lang='it', slow=False)
-                with BytesIO() as fp:
-                    tts.write_to_fp(fp)
-                    fp.seek(0)
-
-                    audio = AudioSegment.from_file(fp, format="mp3")
-
-                    raw_data = audio.raw_data
-                    sample_width = audio.sample_width
-                    channels = audio.channels
-                    frame_rate = audio.frame_rate
-
-                    stream = self.audio.open(
-                        format=self.audio.get_format_from_width(sample_width),
-                        channels=channels,
-                        rate=frame_rate // self.length_speed,
-                        output=True
-                    )
-
-                    stream.write(raw_data)
-        
-                stream.stop_stream()
-                stream.close()
-
-
-
-# def main(args=None):
-#     rclpy.init(args=args)
-#     node = AudioPlayerNode()
-#     rclpy.spin(node)
-#     node.destroy_node()
-#     rclpy.shutdown()
-
-
-# if __name__ == "__main__":
-#     main()
+                try:
+                    # Create TTS object
+                    tts = gTTS(text=msg.data, lang='it', slow=False)
+                    
+                    # Transorm tts to right format
+                    mp3_fp = BytesIO()
+                    tts.write_to_fp(mp3_fp)
+                    mp3_fp.seek(0)
+                    
+                    self.play_audio(mp3_fp.read(), "mp3")
+                    
+                except Exception as e:
+                    self.get_logger().error(f"Error in gTTS playback: {str(e)}")

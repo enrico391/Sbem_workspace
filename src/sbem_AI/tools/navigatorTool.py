@@ -48,6 +48,8 @@ class NavigatorCommander(BaseTool):
         
         if(namePos != ""):
             coord = self._tf_manage.return_position().get(namePos)
+            x_pos = coord["x"]
+            y_pos = coord["y"]
             
         #initialize the navigator
         self._navigator = BasicNavigator()
@@ -60,8 +62,8 @@ class NavigatorCommander(BaseTool):
         goal_pose.header.stamp = self._navigator.get_clock().now().to_msg()
         goal_pose.pose.position.x = float(x_pos)
         goal_pose.pose.position.y = float(y_pos)
-        goal_pose.pose.orientation.w = 0.0 #float(coord["w"])
-        goal_pose.pose.orientation.z = 1.0 #float(coord["z"])
+        #goal_pose.pose.orientation.w = 1.0 #float(coord["w"])
+        #goal_pose.pose.orientation.z = 1.0 #float(coord["z"])
 
         self._navigator.goToPose(goal_pose)
         i = 0
