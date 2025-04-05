@@ -43,9 +43,11 @@ class AutoDockCommander(BaseTool):
     #return_direct: bool = True
 
     _tester: DockingTester = PrivateAttr()
+    _realEnvironment : bool = PrivateAttr()
     
-    def __init__(self):
+    def __init__(self, realEnvironment: bool = False):
         super().__init__()
+        self._realEnvironment = realEnvironment
         #rclpy.init()
         # self._tester = DockingTester()
         # self._tester.startup()
@@ -60,23 +62,25 @@ class AutoDockCommander(BaseTool):
             dock_pose.header.stamp = self._tester.get_clock().now().to_msg()
             dock_pose.header.frame_id = "map"
 
-            #coordinates for the dock real world
-            # dock_pose.pose.position.x = 5.993222767289538 
-            # dock_pose.pose.position.y = -2.0058217548165835 
-            # dock_pose.pose.position.z = 0.0
-            # dock_pose.pose.orientation.x = 0.0
-            # dock_pose.pose.orientation.y = 0.0
-            # dock_pose.pose.orientation.z = 0.96093202830228586
-            # dock_pose.pose.orientation.w = 0.27678445943162139
-
-            #coordinates for the dock gazebo
-            dock_pose.pose.position.x = -4.28
-            dock_pose.pose.position.y = -10.6
-            dock_pose.pose.position.z = 0.0
-            dock_pose.pose.orientation.x = 0.0
-            dock_pose.pose.orientation.y = 0.0
-            dock_pose.pose.orientation.z = 0.77
-            dock_pose.pose.orientation.w = 0.64
+            
+            if self._realEnvironment:
+                #coordinates for the dock real world
+                dock_pose.pose.position.x = 5.993222767289538 
+                dock_pose.pose.position.y = -2.0058217548165835 
+                dock_pose.pose.position.z = 0.0
+                dock_pose.pose.orientation.x = 0.0
+                dock_pose.pose.orientation.y = 0.0
+                dock_pose.pose.orientation.z = 0.96093202830228586
+                dock_pose.pose.orientation.w = 0.27678445943162139
+            else:
+                #coordinates for the dock gazebo
+                dock_pose.pose.position.x = -4.28
+                dock_pose.pose.position.y = -10.6
+                dock_pose.pose.position.z = 0.0
+                dock_pose.pose.orientation.x = 0.0
+                dock_pose.pose.orientation.y = 0.0
+                dock_pose.pose.orientation.z = 0.77
+                dock_pose.pose.orientation.w = 0.64
             
 
             self._tester.dockRobot(dock_pose)

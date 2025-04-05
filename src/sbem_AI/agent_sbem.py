@@ -59,7 +59,7 @@ class AgentClass(Node):
         self.responseUser = self.create_publisher(String,"/response_to_user",10)
 
         # for app animation
-        self.pub_startAnswer = self.create_publisher(Bool, "/start_answer", 10)
+        self.pub_startResponse = self.create_publisher(Bool, "/start_answer", 10)
 
         search = TavilySearchResults(max_results=2)
         
@@ -68,7 +68,7 @@ class AgentClass(Node):
         savePositionTool = SavePosition(tf_manager)
         getPositionTool = GetPosition(tf_manager)
         moveTool = MoveCommander()
-        autoDockTool = AutoDockCommander()
+        autoDockTool = AutoDockCommander(realEnvironment=False)
         imageRecognitionTool = ImageRecognition(image_manager)
         
 
@@ -85,7 +85,7 @@ class AgentClass(Node):
             Your capabilities include:
             - Moving around the house autonomously using navigation tools
             - Saving and returning to specific locations when requested
-            - Searching the web for information to answer user questions
+            - Searchin3g the web for information to answer user questions
             - Visual recognition to identify objects and people through your camera
             - Self-maintenance like returning to your charging dock when needed
             
@@ -108,7 +108,7 @@ class AgentClass(Node):
             Current date: {str(date.today())}
             
             Remember to use your tools appropriately for each request rather than simulating actions.
-            DON'T SEND DUPLICATE RESPONSES TO THE USER AND DON'T USE SYMBOL * IN THE SENTENCES.
+            DON'T SEND DUPLICATE RESPONSES TO THE USER AND DON'T USE SYMBOL WITH * IN THE SENTENCES.
         """))
 
         # model = ChatOllama(
@@ -139,13 +139,12 @@ class AgentClass(Node):
 
                 if(message.type == 'ai'):
                     resp = String()
-                    resp.data = message.content
-
+                    resp.data = message.content.replace('*', '')
                     # publish the response to the user
                     self.responseUser.publish(resp)
                     
                     # start flag for animation on the app
-                    #self.pub_startAnswer.publish(Bool(data=True))
+                    #self.pub_startResponse.publish(Bool(data=True))
         
 
     def user_input_callback(self,msg):

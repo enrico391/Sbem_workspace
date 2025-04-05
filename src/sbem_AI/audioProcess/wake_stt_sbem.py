@@ -142,7 +142,7 @@ class ProcessAudio(Node):
         """Start record audio"""
         self.start_record = True
         self.pub_startAnswer.publish(Bool(data=True))
-        self.get_logger().info("Recording started...")
+        self.get_logger().info("Recording...")
         
         # Initialize recording variables
         self.rec = []
