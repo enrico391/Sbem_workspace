@@ -18,7 +18,7 @@ class MoveRobot(Node):
 
 
     def rotate(self, degree, speed):
-        time = (np.deg2rad(abs(degree))*self.cir) / (2 * math.pi * speed * self.wheel_radius)
+        time = ((np.deg2rad(abs(degree))*self.cir) / (2 * math.pi * speed * self.wheel_radius))/2
         time = Duration(seconds=time)
         
         twist = Twist()

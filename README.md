@@ -64,8 +64,8 @@ ros2 launch robot_sbem navigation_launch.py
 
 #### 2) Using AMCL Localization (Set Initial Pose in RViz2):
 ```sh
-ros2 launch robot_sbem localization_launch.py  # substitute with map that you want (ex: for gazebo ros2 launch robot_sbem localization_launch.py map:=src/robot_sbem/maps/new_virtual_map/new_map_save.yaml use_simtime:=true)
-ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true # Prevent map updates # for gazebo use_simtime:=true  
+ros2 launch robot_sbem localization_launch.py  # substitute with map that you want (ex: for gazebo ros2 launch robot_sbem localization_launch.py map:=src/robot_sbem/maps/new_virtual_map/new_map_save.yaml use_sim_time:=true)
+ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true # Prevent map updates # for gazebo use_sim_time:=true  
 ```
 
 ---

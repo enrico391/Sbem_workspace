@@ -31,6 +31,8 @@ from tools.moveTool import MoveCommander
 from tools.savePositionTool import SavePosition
 from tools.imageRecognitionTool import ImageRecognition
 from tools.getPositionTool import GetPosition
+from tools.modifyPositionTool import ModifyPosition
+from tools.removePositionTool import RemovePosition
 
 from positionManager import PositionsManager
 from tools.imageSub import ImageSubscriber
@@ -43,8 +45,6 @@ from audioProcess.wake_stt_sbem import ProcessAudio
 
 if "GOOGLE_API_KEY" not in os.environ:
     os.environ["GOOGLE_API_KEY"] = "api_key"
-
-
 
 
 class AgentClass(Node):
@@ -66,14 +66,16 @@ class AgentClass(Node):
         # If we want, we can create other tools.
         navCommander = NavigatorCommander(tf_manager)
         savePositionTool = SavePosition(tf_manager)
+        modifyPositionTool = ModifyPosition(tf_manager)
         getPositionTool = GetPosition(tf_manager)
+        removePositionTool = RemovePosition(tf_manager)
         moveTool = MoveCommander()
         autoDockTool = AutoDockCommander(realEnvironment=False)
         imageRecognitionTool = ImageRecognition(image_manager)
         
 
         # Once we have all the tools we want, we can put them in a list that we will reference later.
-        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, getPositionTool, autoDockTool, navCommander, imageRecognitionTool ]
+        tools = [search, tools_sbem.getsqrt, moveTool, savePositionTool, getPositionTool, modifyPositionTool, removePositionTool, autoDockTool, navCommander, imageRecognitionTool ]
 
         memory = MemorySaver()
 
@@ -100,16 +102,23 @@ class AgentClass(Node):
             -NavigatorCommander: use it to navigate around the house, you need to provide the name of the position or the coordinates.
             -SavePosition: use it to save a position in the house, you need to provide the name of the position.
             -GetPosition: use it to get the coordinates of a position in the house, you need to provide the name of the stored position.
+            -ModifyPosition: use it to modify a position in the house, you need to provide the name of the stored position.
+            -RemovePosition: use it to remove a position in the house, you need to provide the name of the stored position.
             -MoveCommander: use it to move to a specific position
             -ImageRecognition: use it to recognize objects and people in the house
             -TavilySearchResults: use it to search the web for information
             -GetSqrt: use it to calculate the square root of a number
+                                        
             
-            Current date: {str(date.today())}
+            Current date: {str(date.today())}.
+
+            Your saved positions are: {tf_manager.return_name_position()}.
             
             Remember to use your tools appropriately for each request rather than simulating actions.
-            DON'T SEND DUPLICATE RESPONSES TO THE USER AND DON'T USE SYMBOL WITH * IN THE SENTENCES.
+            WHEN YOU SEND THE LAST MESSAGE AFTER TOOL USAGE YOU HAVE TO PROVIDE A FEEDBACK OF THE COMPLETE ACTION.
+            
         """))
+        print(tf_manager.return_name_position())
 
         # model = ChatOllama(
         #     base_url="http://localhost:11434",

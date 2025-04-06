@@ -62,7 +62,7 @@ class AudioPlayerNode(Node):
 
     def play_audio(self, content, format):
         """Function to play audio data"""
-
+        
         try:
             # Convert the audio data to an AudioSegment
             audio = AudioSegment.from_file(BytesIO(content), format=format)
@@ -81,7 +81,7 @@ class AudioPlayerNode(Node):
                 output=True
             )
             
-            # Play audio in chunks #TODO stop if new SPEM detection arrived
+            
             
             # Reset interrupt flag at start of playback
             self.interrupt_playback = False
@@ -93,6 +93,8 @@ class AudioPlayerNode(Node):
                     break
                 stream.write(raw_data[i:i+chunk_size])
             
+            # reset interrupt flag after playback
+            self.interrupt_playback = False
             # Clean stream
             stream.stop_stream()
             stream.close()
@@ -104,6 +106,9 @@ class AudioPlayerNode(Node):
 
     def audio_callback(self, msg: String) -> None:
         """callback for subscriber to string response from agent"""
+        # for interrupting the playback when a new message is received
+        self.interrupt_playback = True
+        
         if(msg.data != ""):
             #send request to piper server for transcribe or publish over topic
             if self.useLocalTTS:
