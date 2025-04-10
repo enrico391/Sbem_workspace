@@ -39,7 +39,8 @@ This section explains how to start all required packages for simple navigation u
 
    ```sh
    ros2 launch robot_sbem sbem.launch.py  # Launch robot description
-   ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry
+   ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry without transform
+   ros2 run robot_sbem diff_tf.py # publish odom and transform --> use it when you don't use fuse imu 
    ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
    ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
    ros2 launch robot_sbem robot_localization.launch.py  # Fuse wheel odometry and IMU data (TODO)
@@ -137,6 +138,8 @@ source install/setup.bash
 ### Essential ROS2 Nodes:
 ```sh
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0  # MicroROS communication with ESP32
+
+Desktop/sbem_ws/src/robot_sbem/scripts$ python3 imu_publisher.py # Publish imu data with raspberry
 
 ros2 run rplidar_ros rplidar_composition --ros-args -p serial_port:=/dev/ttyUSB0 -p frame_id:=laser_frame -p angle_compensate:=true -p scan_mode:=Standard -p serial_baudrate:=115200  # Start Lidar
 

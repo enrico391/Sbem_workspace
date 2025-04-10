@@ -15,12 +15,6 @@ RADIUS_WHEEL = 0.08
 CPR = 90
 
 class DiffTf(Node):
-    """
-       diff_tf.py - follows the output of a wheel encoder and
-       creates tf and odometry messages.
-       some code borrowed from the arbotix diff_controller script
-       A good reference: http://rossum.sourceforge.net/papers/DiffSteer/
-    """
 
     def __init__(self):
         super().__init__("diff_tf")
@@ -28,7 +22,7 @@ class DiffTf(Node):
         self.get_logger().info(f"-I- {self.nodename} started")
 
         #### parameters #######
-        self.rate_hz = self.declare_parameter("rate_hz", 10.0).value # the rate at which to publish the transform
+        self.rate_hz = self.declare_parameter("rate_hz", 60.0).value # the rate at which to publish the transform
         self.create_timer(1.0/self.rate_hz, self.update)  
 
         self.ticks_meter = float(
@@ -71,7 +65,7 @@ class DiffTf(Node):
         # subscriptions
         self.create_subscription(Float32, "lwheel", self.lwheel_callback, 10)
         self.create_subscription(Float32, "rwheel", self.rwheel_callback, 10)
-        self.odom_pub = self.create_publisher(Odometry, "/odom/unfiltered", 10)
+        self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
 
 
     def update(self):
