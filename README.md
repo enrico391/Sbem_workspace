@@ -81,7 +81,9 @@ ros2 launch sbem_docking docking_sbem.launch.py  params_file_dock:='/home/moroli
 
 ### Start Apriltag detection:
 ```sh
-ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image_raw -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
+ros2 run image_transport republish compressed raw --ros-args --remap in/compressed:=/image_raw/compressed --remap out:=/image
+
+ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
 ```
 
 *(For Gazebo simulation, use:)*
