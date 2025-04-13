@@ -12,6 +12,7 @@ from nav_msgs.msg import Odometry
 from tf2_ros import TransformBroadcaster
 #from std_msgs.msg import Int16
 from std_msgs.msg import Float32
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 NS_TO_SEC= 1000000000
 
@@ -30,6 +31,11 @@ class DiffTf(Node):
         super().__init__("diff_tf")
         self.nodename = "diff_tf"
         self.get_logger().info(f"-I- {self.nodename} started")
+
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,  # or RELIABLE
+            depth=10
+            )       
 
         #### parameters #######
         self.rate_hz = self.declare_parameter("rate_hz", 40.0).value # the rate at which to publish the transform
@@ -68,8 +74,8 @@ class DiffTf(Node):
         self.then = self.get_clock().now()
 
         # subscriptions
-        self.create_subscription(Float32, "lwheel", self.lwheel_callback, 10)
-        self.create_subscription(Float32, "rwheel", self.rwheel_callback, 10)
+        self.create_subscription(Float32, "lwheel", self.lwheel_callback, qos_profile=qos_profile)
+        self.create_subscription(Float32, "rwheel", self.rwheel_callback, qos_profile=qos_profile)
         self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
         self.odom_broadcaster = TransformBroadcaster(self)
 

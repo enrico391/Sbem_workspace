@@ -21,6 +21,11 @@ class DiffTf(Node):
         self.nodename = "diff_tf"
         self.get_logger().info(f"-I- {self.nodename} started")
 
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,  # or RELIABLE
+            depth=10
+            )  
+
         #### parameters #######
         self.rate_hz = self.declare_parameter("rate_hz", 60.0).value # the rate at which to publish the transform
         self.create_timer(1.0/self.rate_hz, self.update)  
@@ -63,8 +68,8 @@ class DiffTf(Node):
         self.offsetR = 0.0
 
         # subscriptions
-        self.create_subscription(Float32, "lwheel", self.lwheel_callback, 10)
-        self.create_subscription(Float32, "rwheel", self.rwheel_callback, 10)
+        self.create_subscription(Float32, "lwheel", self.lwheel_callback, qos_profile=qos_profile)
+        self.create_subscription(Float32, "rwheel", self.rwheel_callback, qos_profile=qos_profile)
         self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
 
 
