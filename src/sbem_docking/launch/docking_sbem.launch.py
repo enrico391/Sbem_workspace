@@ -125,28 +125,6 @@ def generate_launch_description():
         parameters=[{'autostart': True}, {'node_names': ['docking_server']}],
     )
 
-    # nav2_bringup_launch = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [nav2_bringup_launch_dir, '/bringup_launch.py']),
-    #     launch_arguments={
-    #         'namespace': namespace,
-    #         'use_namespace': use_namespace,
-    #         'use_composition': use_composition,
-    #         'map': map_dir,
-    #         'use_sim_time': use_sim_time
-    #         #'params_file': configured_params,
-    #     }.items(),
-    # )
-
-    # dock_detection_launch = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(os.path.join(
-    #         nova_carter_dock_launch_dir, 'isaac_apriltag_detection_pipeline.launch.py')),
-    #     launch_arguments={
-    #         'launch_rviz': launch_rviz,
-    #         'image': image,
-    #         'camera_info': camera_info,
-    #     }.items()
-    # )
 
     return LaunchDescription(launch_args + [
         #dock_detection_launch,

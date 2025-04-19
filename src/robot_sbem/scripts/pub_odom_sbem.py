@@ -8,6 +8,7 @@ from math import sin, cos, pi
 from geometry_msgs.msg import Quaternion
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 NS_TO_SEC= 1000000000
 

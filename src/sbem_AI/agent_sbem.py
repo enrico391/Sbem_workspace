@@ -70,7 +70,7 @@ class AgentClass(Node):
         getPositionTool = GetPosition(tf_manager)
         removePositionTool = RemovePosition(tf_manager)
         moveTool = MoveCommander()
-        autoDockTool = AutoDockCommander(realEnvironment=False)
+        autoDockTool = AutoDockCommander(realEnvironment=True)
         imageRecognitionTool = ImageRecognition(image_manager)
         
 
@@ -127,7 +127,7 @@ class AgentClass(Node):
         # )
 
         model = ChatGoogleGenerativeAI(
-                    model="gemini-2.0-pro-exp-02-05",
+                    model="gemini-2.0-flash-lite-001",
                     temperature=0,    
                 )
     

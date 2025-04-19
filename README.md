@@ -37,6 +37,14 @@ This section explains how to start all required packages for simple navigation u
 
 2. Start essential nodes *(for real robot)*:
 
+  ```sh
+  ros2 launch robot_sbem sbem_real_total.launch.py # start robot description, odom publisher, laser filter , fusing odom and laser
+  ros2 launch robot_sbem localization_launch.py
+  ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true
+
+  ```
+
+  - Single nodes 
    ```sh
    ros2 launch robot_sbem sbem.launch.py  # Launch robot description
    ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry without transform
@@ -81,7 +89,7 @@ ros2 launch sbem_docking docking_sbem.launch.py  params_file_dock:='/home/moroli
 
 ### Start Apriltag detection:
 ```sh
-ros2 run image_transport republish compressed raw --ros-args --remap in/compressed:=/image_raw/compressed --remap out:=/image
+ros2 launch robot_sbem sbem.vision.launch.py
 
 ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
 ```
@@ -135,6 +143,7 @@ To run the real SBEM robot, start the following nodes on the Raspberry Pi:
 ```sh
 cd Desktop/sbem_ws/
 source install/setup.bash
+ros2 launch robot_sbem sbem_total_rpy.launch.py
 ```
 
 ### Essential ROS2 Nodes:

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10...3.27)
 project(robot_sbem)
 
 # Default to C99
@@ -33,7 +33,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY config description launch worlds params maps meshes
+  DIRECTORY config description launch worlds maps meshes
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -44,8 +44,8 @@ install(PROGRAMS
 )
 #for scripts
 install(PROGRAMS
-scripts/imu_tf.py
-DESTINATION lib/${PROJECT_NAME}
+  scripts/imu_tf.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 #for scripts
 install(PROGRAMS
@@ -63,9 +63,6 @@ install(PROGRAMS
 scripts/yolo5_node.py
 DESTINATION lib/${PROJECT_NAME}
 )
-
-
-
 
 
 
