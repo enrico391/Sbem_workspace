@@ -7,8 +7,9 @@
 <xacro:include filename="lidar.xacro" />
 <xacro:include filename="$(find robot_sbem)/description/depth_camera.xacro" /> 
 <xacro:include filename="camera.xacro" />
-
-
+<xacro:if value="$(arg use_ros2_control)">
+        <xacro:include filename="ros2_control.xacro" />
+</xacro:if>
 
 
 
