@@ -28,7 +28,7 @@ class DiffTf(Node):
             )  
 
         #### parameters #######
-        self.rate_hz = self.declare_parameter("rate_hz", 60.0).value # the rate at which to publish the transform
+        self.rate_hz = self.declare_parameter("rate_hz", 30.0).value # the rate at which to publish the transform
         self.create_timer(1.0/self.rate_hz, self.update)  
 
         self.ticks_meter = float(

@@ -37,29 +37,29 @@ This section explains how to start all required packages for simple navigation u
 
 2. Start essential nodes *(for real robot)*:
 
-  ```sh
-  ros2 launch robot_sbem sbem_real_total.launch.py # start robot description, odom publisher, laser filter , fusing odom and laser
-  ros2 launch robot_sbem localization_launch.py
-  ros2 launch robot_sbem navigation_launch.py map_subscribe_transient_local:=true
+  - Real robot:
+    ```sh
+    ros2 launch robot_sbem sbem_real_total.launch.py # start robot description, odom publisher, laser filter , fusing odom and laser
+    ros2 launch robot_sbem localization_launch.py
+    ros2 launch robot_sbem navigation_docking_launch.py map_subscribe_transient_local:=true # fix problem with controller and docking TODO
 
-  ```
+    ```
 
-  - Single nodes 
-   ```sh
-   ros2 launch robot_sbem sbem.launch.py  # Launch robot description
-   ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry without transform
-   ros2 run robot_sbem diff_tf.py # publish odom and transform --> use it when you don't use fuse imu 
-   ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
-   ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
-   ros2 launch robot_sbem robot_localization.launch.py  # Fuse wheel odometry and IMU data (TODO)
-   ```
-
-    2.1 *(for simulated robot)*
-      ```sh
-      ros2 launch robot_sbem launch_sim.launch.py # start gazebo simulation, robot description and sensors
-      ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
-      ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
-      ```
+  - Real robot single nodes: 
+    ```sh
+    ros2 launch robot_sbem sbem.launch.py  # Launch robot description
+    ros2 run robot_sbem pub_odom_sbem.py  # Publish wheel odometry without transform
+    ros2 run robot_sbem diff_tf.py # publish odom and transform --> use it when you don't use fuse imu 
+    ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
+    ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
+    ros2 launch robot_sbem robot_localization.launch.py  # Fuse wheel odometry and IMU data (TODO)
+    ```
+  - *(for simulated robot)*
+    ```sh
+    ros2 launch robot_sbem launch_sim.launch.py # start gazebo simulation, robot description and sensors
+    ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
+    ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
+    ```
 
 ### Two Options After Initialization:
 - **1 Create a new map**
@@ -89,7 +89,6 @@ ros2 launch sbem_docking docking_sbem.launch.py  params_file_dock:='/home/moroli
 
 ### Start Apriltag detection:
 ```sh
-ros2 launch robot_sbem sbem.vision.launch.py
 
 ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
 ```
