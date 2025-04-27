@@ -32,7 +32,7 @@ docking_server:
       external_detection_rotation_pitch:  0.0
       external_detection_rotation_yaw: 0.0
       filter_coef: 0.1
-      charging_threshold: 0.00255
+      charging_threshold: 0.0025
 
     # Dock instances
     docks: ['home_dock']

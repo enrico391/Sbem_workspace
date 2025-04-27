@@ -68,6 +68,28 @@ def generate_launch_description():
                     "config", "footprint_filter_laser.yaml",
                 ])],
         )
+    
+
+    ros_bridge_server = Node(
+        package='rosbridge_server',
+        executable='rosbridge_websocket',
+        name='rosbridge_websocket',
+        output='screen',
+    )
+
+    # Create a node image republisher node
+    node_image_republisher = Node(
+        package='image_transport',
+        executable='republish',
+        output='screen',
+        name='image_republisher_compressed',
+        arguments=['compressed', 'raw'],
+        remappings=[
+            ('in/compressed', '/image_raw/compressed'),
+            ('out', '/image')
+        ],
+    )
+    
 
 
     # Launch!
@@ -80,5 +102,7 @@ def generate_launch_description():
         node_robot_state_publisher,
         odom_node,
         laser_filter,
-        fusing_node
+        fusing_node,
+        node_image_republisher,
+        ros_bridge_server
     ])

@@ -32,7 +32,7 @@ def generate_launch_description():
 
     namespace = LaunchConfiguration('namespace')
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    autostart = LaunchConfiguration('autostart')
+    autostart = LaunchConfiguration('autostart',default='true')
     params_file = LaunchConfiguration('params_file')
     use_composition = LaunchConfiguration('use_composition')
     container_name = LaunchConfiguration('container_name')

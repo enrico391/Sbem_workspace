@@ -38,8 +38,8 @@ from positionManager import PositionsManager
 from tools.imageSub import ImageSubscriber
 
 #audio imports files
-from audioProcess.tts_sbem import AudioPlayerNode
-from audioProcess.wake_stt_sbem import ProcessAudio
+#from audioProcess.tts_sbem import AudioPlayerNode
+#from audioProcess.wake_stt_sbem import ProcessAudio
 
 
 
@@ -70,7 +70,7 @@ class AgentClass(Node):
         getPositionTool = GetPosition(tf_manager)
         removePositionTool = RemovePosition(tf_manager)
         moveTool = MoveCommander()
-        autoDockTool = AutoDockCommander(realEnvironment=True)
+        autoDockTool = AutoDockCommander(realEnvironment=False)
         imageRecognitionTool = ImageRecognition(image_manager)
         
 
@@ -120,19 +120,21 @@ class AgentClass(Node):
         """))
         print(tf_manager.return_name_position())
 
-        # model = ChatOllama(
-        #     base_url="http://localhost:11434",
-        #     model="qwen2.5:14b",
-        #     temperature=0,    
-        # )
+        model = ChatOllama(
+            base_url="http://localhost:11434",
+            model="qwen2.5:14b",
+            temperature=0,
+            num_ctx=10240
+        )
 
-        model = ChatGoogleGenerativeAI(
-                    model="gemini-2.0-flash-lite-001",
-                    temperature=0,    
-                )
+        #model = ChatGoogleGenerativeAI(
+        #            model="gemma-3-27b-it",
+        #            temperature=0,    
+        #        )
     
         #create agent
         self.agent_executor = create_react_agent(model, tools, prompt=prompt, checkpointer=memory)
+        self.agent_executor.step_timeout = 5*60  # 5 minutes
         self.config = {"configurable": {"thread_id": "abc1333"}}
 
 
@@ -179,14 +181,14 @@ def main(args=None):
     agent = AgentClass(position_manager, img_node)
 
     # audio nodes
-    tts_node = AudioPlayerNode(useLocalTTS=False,typeLocalTTS="coqui")
-    wake_stt_node = ProcessAudio()
+    #tts_node = AudioPlayerNode(useLocalTTS=False,typeLocalTTS="coqui")
+    #wake_stt_node = ProcessAudio()
 
 
     executor = MultiThreadedExecutor()
     executor.add_node(position_manager)
-    executor.add_node(tts_node)
-    executor.add_node(wake_stt_node)
+    #executor.add_node(tts_node)
+    #executor.add_node(wake_stt_node)
     executor.add_node(img_node)
     executor.add_node(agent)
 
