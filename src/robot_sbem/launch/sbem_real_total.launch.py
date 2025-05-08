@@ -96,8 +96,14 @@ def generate_launch_description():
         executable='stt_socketServer.py',  
     )
     
-    
-
+    # Create an RViz node to visualize the robot with a custom config
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(pkg_path, 'config', 'config_rviz.rviz')],
+    )
 
     # Launch!
     return LaunchDescription([
@@ -112,5 +118,6 @@ def generate_launch_description():
         fusing_node,
         node_image_republisher,
         ros_bridge_server,
-        tts_local_server
+        tts_local_server,
+        rviz_node
     ])
