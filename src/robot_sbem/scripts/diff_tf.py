@@ -28,8 +28,8 @@ class DiffTf(Node):
     """
 
     def __init__(self):
-        super().__init__("diff_tf")
-        self.nodename = "diff_tf"
+        super().__init__("odom_tf_publisher")
+        self.nodename = "odom_tf_publisher"
         self.get_logger().info(f"-I- {self.nodename} started")
 
         qos_profile = QoSProfile(

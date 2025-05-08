@@ -18,8 +18,8 @@ CPR = 90
 class DiffTf(Node):
 
     def __init__(self):
-        super().__init__("diff_tf")
-        self.nodename = "diff_tf"
+        super().__init__("odometry_publisher")
+        self.nodename = "odometry_publisher"
         self.get_logger().info(f"-I- {self.nodename} started")
 
         qos_profile = QoSProfile(
