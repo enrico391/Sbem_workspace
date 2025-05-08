@@ -89,6 +89,13 @@ def generate_launch_description():
             ('out', '/image')
         ],
     )
+
+    # Create a node for the TTS local server
+    tts_local_server = Node(
+        package='sbem_speaking',
+        executable='stt_socketServer.py',  
+    )
+    
     
 
 
@@ -104,5 +111,6 @@ def generate_launch_description():
         laser_filter,
         fusing_node,
         node_image_republisher,
-        ros_bridge_server
+        ros_bridge_server,
+        tts_local_server
     ])
