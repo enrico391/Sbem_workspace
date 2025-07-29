@@ -465,11 +465,11 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP" # change to "CLOSED_LOOP" with kalman filter
-    max_velocity: [0.5, 0.5, 2.5]
-    min_velocity: [-0.5, -0.5, -2.5]
-    max_accel: [2.5, 0.0, 3.2]
+    max_velocity: [0.15, 0.15, 1.0]
+    min_velocity: [-0.15, -0.15, -1.0]
+    max_accel: [1.0, 0.0, 1.5]
     max_decel: [-0.5, -0.5, -3.2]
-    odom_topic: /odometry/filtered #"/odom" #"/odometry/filtered"   # o /odom/unfiltered without robot_localization package
+    odom_topic: /odom #"/odom" #"/odometry/filtered"   # o /odom/unfiltered without robot_localization package
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
