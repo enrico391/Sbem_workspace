@@ -37,32 +37,12 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-#for scripts
+
 install(PROGRAMS
-  scripts/diff_tf.py
-  DESTINATION lib/${PROJECT_NAME}
-)
-#for scripts
-install(PROGRAMS
-  scripts/imu_tf.py
-  DESTINATION lib/${PROJECT_NAME}
-)
-#for scripts
-install(PROGRAMS
-  scripts/pub_odom_sbem.py
+  scripts/imu_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
-
-install(PROGRAMS
-scripts/example_nav_to_pose.py
-DESTINATION lib/${PROJECT_NAME}
-)
-
-install(PROGRAMS
-scripts/yolo5_node.py
-DESTINATION lib/${PROJECT_NAME}
-)
 
 
 

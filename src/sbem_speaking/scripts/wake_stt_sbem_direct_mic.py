@@ -11,7 +11,6 @@ import pyaudio
 import numpy as np
 
 import time
-from faster_whisper import WhisperModel
 import math
 import struct
 from scipy.signal import resample
@@ -23,6 +22,12 @@ from openwakeword.model import Model
 from rclpy.qos import qos_profile_sensor_data
 import rclpy.time
 
+import socket
+import pickle
+import struct
+
+import RPi.GPIO as GPIO
+
 SHORT_NORMALIZE = (1.0/32768.0)
 
 TIMEOUT_LENGTH = 3
@@ -30,7 +35,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 CHUNK = 1024  # Number of audio frames per buffer
-WAKE_WORD_THRESHOLD = 0.5
+WAKE_WORD_THRESHOLD = 0.3
 RMS_THRESHOLD = 30
 
 openwakeword.utils.download_models()
@@ -41,12 +46,21 @@ class ProcessAudio(Node):
         super().__init__("processAudio")
         self.nodename = "processAudio"
         
-        self.model = WhisperModel("large-v3", device="cuda", compute_type="float16")
+        #self.model = WhisperModel("large-v3", device="cuda", compute_type="float16")
+        
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_address = ('192.168.178.152', 8765)  # Replace SERVER_IP with your server's IP
+        try:
+            self.sock.connect(self.server_address)
+            self.get_logger().info("Socket client connected to server.")
+	
+        except Exception as e:
+            self.get_logger().error(f"Socket connection failed: {e}")
 
-        model_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "scripts/audioProcess/spem_v2.tflite"
-        )
+        # model_path = os.path.join(
+        #     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        #     "scripts/audioProcess/spem_v2.tflite"
+        # )
 
         self.model_wake_word = Model(wakeword_models=["jarvis"],inference_framework="tflite")
 
@@ -95,6 +109,11 @@ class ProcessAudio(Node):
 
         # Create a timer for processing audio
         self.timer = self.create_timer(0.01, self.process_audio)
+
+        # create gpio mode for pin LED
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(22, GPIO.OUT)
+        GPIO.output(22, GPIO.LOW)
         
         self.get_logger().info(f"-I- {self.nodename} started with direct microphone input")
         
@@ -117,6 +136,9 @@ class ProcessAudio(Node):
     def start_recording(self):
         """Start record audio"""
         self.start_record = True
+        # set LED ON
+        GPIO.output(22, GPIO.HIGH)
+
         self.pub_startAnswer.publish(Bool(data=True))
         self.get_logger().info("Recording...")
         
@@ -147,6 +169,10 @@ class ProcessAudio(Node):
             self.rec = []  # Clear the buffer
         
         self.start_record = False
+
+        # set LED OFF
+        GPIO.output(22, GPIO.LOW)
+
         self.pub_startAnswer.publish(Bool(data=False))
         self.get_logger().info("Recording finished")
 
@@ -166,24 +192,49 @@ class ProcessAudio(Node):
             
             self.get_logger().info("Transcribing audio...")
             
-            # Transcribe directly from the numpy array
-            segments, _ = self.model.transcribe(audio_float, beam_size=5)
+            # Transcribe with websocket server
+            data = pickle.dumps(audio_float)
+            # Send length of data first
+            self.sock.sendall(len(data).to_bytes(4, byteorder='big'))
+            self.sock.sendall(data)
+            self.get_logger().info("Sent audio_float to server.")
             
-            transcribed_text = ""
-            for segment in segments:
-                transcript = segment.text
-                transcribed_text += transcript + " "
-                self.get_logger().info(f"[{segment.start:.2f}s -> {segment.end:.2f}s] {transcript}")
+            #segments, _ = self.model.transcribe(audio_float, beam_size=5)
             
-            if transcribed_text.strip():
-                # Publish transcript
-                msg_text = String()
-                msg_text.data = transcribed_text.strip()
-                self.pub_tts.publish(msg_text)
-                return True
-            else:
-                self.get_logger().warning("No transcription produced")
+            # --- Receive response from server ---
+            # First, receive the length of the response (4 bytes)
+            response_len_bytes = self.sock.recv(4)
+            if len(response_len_bytes) < 4:
+                self.get_logger().error("Failed to receive response length from server.")
                 return False
+            response_len = int.from_bytes(response_len_bytes, byteorder='big')
+
+            # Now receive the actual response data
+            response_data = b''
+            while len(response_data) < response_len:
+                packet = self.sock.recv(response_len - len(response_data))
+                if not packet:
+                    break
+                response_data += packet
+
+            if len(response_data) != response_len:
+                self.get_logger().error("Incomplete response received from server.")
+                return False
+
+            # Unpickle the response (assuming it's a string or object)
+            transcribed_text = pickle.loads(response_data)
+            self.get_logger().info(f"Received transcription: {transcribed_text}")
+
+            
+            # if transcribed_text.strip():
+            #     # Publish transcript
+            #     msg_text = String()
+            #     msg_text.data = transcribed_text.strip()
+            #     self.pub_tts.publish(msg_text)
+            #     return True
+            # else:
+            #     self.get_logger().warning("No transcription produced")
+            #     return False
         
         except Exception as e:
             self.get_logger().error(f"Error transcribing: {str(e)}")
@@ -226,7 +277,11 @@ class ProcessAudio(Node):
                     self.finish_recording()
                     
         except Exception as e:
+            # set LED OFF
+            GPIO.output(22, GPIO.LOW)
+            
             self.get_logger().error(f"Error in process_audio: {str(e)}")
+            
 
     def destroy_node(self):
         """Clean up when node is destroyed"""
