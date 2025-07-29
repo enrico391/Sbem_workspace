@@ -32,7 +32,7 @@ device_address = 0x68   # MPU6050 device address
 class ImuPublisher(Node):
     def __init__(self):
         super().__init__('imu_publisher')
-        self.publisher_ = self.create_publisher(Imu, 'imu/data', 10)
+        self.publisher_ = self.create_publisher(Imu, 'imu_data', 10)
         self.timer = self.create_timer(0.05, self.timer_callback)  # 10Hz
         self.get_logger().info('IMU Publisher Node has been started')
         

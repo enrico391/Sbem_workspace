@@ -30,4 +30,20 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+
+install(PROGRAMS
+scripts/wake_stt_sbem_direct_mic.py
+DESTINATION lib/${PROJECT_NAME}
+)
+
+install(PROGRAMS
+scripts/tts_sbem.py
+DESTINATION lib/${PROJECT_NAME}
+)
+
+install(PROGRAMS
+scripts/send_toTTS.py
+DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
