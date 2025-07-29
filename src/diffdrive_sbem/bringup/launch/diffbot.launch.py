@@ -39,10 +39,26 @@ def generate_launch_description():
             description="Start robot with mock hardware mirroring command to its states.",
         )
     )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "use_ros2_control",
+            default_value="true",
+            description="Use ros2_control if true",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "use_sim_time",
+            default_value="false",
+            description="Use sim time if true",
+        )
+    )
 
     # Initialize Arguments
     gui = LaunchConfiguration("gui")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
+    use_ros2_control = LaunchConfiguration('use_ros2_control')
+    use_sim_time = LaunchConfiguration('use_sim_time')
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -50,11 +66,15 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("diffdrive_sbem"), "urdf", "diffbot.urdf.xacro"]
+                [FindPackageShare("robot_sbem"), "description", "robot_sbem.urdf.xacro"]
             ),
             " ",
             "use_mock_hardware:=",
             use_mock_hardware,
+            " use_ros2_control:=",
+            use_ros2_control,
+            ' sim_mode:=',
+            use_sim_time
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -77,7 +97,7 @@ def generate_launch_description():
         output="both",
         remappings=[
             ("~/robot_description", "/robot_description"),
-            ("/diffbot_base_controller/cmd_vel", "/cmd_vel"),
+            ("/diffbot_base_controller/cmd_vel", "/cmd_vel_stamped"),
         ],
     )
     robot_state_pub_node = Node(
