@@ -139,11 +139,17 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 
 hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
-{
-  int motor_l_counts_per_loop = wheel_l_.cmd / wheel_l_.rads_per_count / cfg_.loop_rate;
-  int motor_r_counts_per_loop = wheel_r_.cmd / wheel_r_.rads_per_count / cfg_.loop_rate;
+{ 
+  std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
+  
+  double motor_l_counts_per_loop = wheel_l_.cmd / wheel_l_.rads_per_count / cfg_.loop_rate;
+  double motor_r_counts_per_loop = wheel_r_.cmd / wheel_r_.rads_per_count / cfg_.loop_rate;
+  
+  // print for debugging
+  std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
+  std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;
 
-  comms_.set_motor_values(motor_l_counts_per_loop, motor_r_counts_per_loop);
+  comms_.set_motor_values((float)motor_l_counts_per_loop, (float)motor_r_counts_per_loop);
 
   return hardware_interface::return_type::OK;
 }
