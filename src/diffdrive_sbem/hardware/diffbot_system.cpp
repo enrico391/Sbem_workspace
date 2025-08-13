@@ -48,6 +48,8 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   cfg_.timeout_ms = std::stoi(info_.hardware_parameters["timeout_ms"]);
   cfg_.enc_counts_per_rev = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
 
+  std::cout << "ENC COUNTS PER REV: " << cfg_.enc_counts_per_rev << std::endl;
+  
   wheel_l_.setup(cfg_.left_wheel_name, cfg_.enc_counts_per_rev);
   wheel_r_.setup(cfg_.right_wheel_name, cfg_.enc_counts_per_rev);
   
@@ -127,6 +129,7 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 
 
   pos_prev = wheel_r_.pos;
+  std::cout << "Wheel R Enc: " << wheel_r_.calc_enc_angle() << std::endl;
   wheel_r_.pos = wheel_r_.calc_enc_angle();
   wheel_r_.vel = (wheel_r_.pos - pos_prev) / delta_seconds;
   
