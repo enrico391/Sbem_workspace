@@ -91,6 +91,13 @@ def generate_launch_description():
             ('out', '/image')
         ],
     )
+
+    server_stt = Node(
+        package='sbem_speaking',
+        executable='stt_socket_server.py',
+        name='audio_transcription_server',
+        output='screen',
+    )
     
 
 
@@ -106,5 +113,6 @@ def generate_launch_description():
         #laser_filter,
         #fusing_node,
         node_image_republisher,
-        ros_bridge_server
+        ros_bridge_server,
+        server_stt,
     ])
