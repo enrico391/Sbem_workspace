@@ -20,17 +20,19 @@ def generate_launch_description():
 
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('robot_sbem'))
-    xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro')
-    robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' use_sim_time:=', use_sim_time])
+    #xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro')
+    
+    #robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' use_sim_time:=', use_sim_time])
     
     # Create a robot_state_publisher node
-    params = {'robot_description': robot_description_config}
-    node_robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        output='screen',
-        parameters=[params]
-    )
+    #params = {'robot_description': robot_description_config}
+    
+    #node_robot_state_publisher = Node(
+    #    package='robot_state_publisher',
+    #    executable='robot_state_publisher',
+    #    output='screen',
+    #    parameters=[params]
+    #)
 
     # Create a node for the odometry and publish transform
     # odom_node = Node(
@@ -39,35 +41,35 @@ def generate_launch_description():
     #      )
     
     # publish only odometry
-    odom_node = Node(
-            package='robot_sbem',
-            executable='pub_odom_sbem.py',
-         )
-    
-    # node for robot localization with kalman filter
-    fusing_node = Node(
-            package='robot_localization',
-            executable='ekf_node',
-            name='ekf_filter_node',
-            output='screen',
-            parameters=[
-                PathJoinSubstitution([
-                    get_package_share_directory("robot_sbem"),
-                    "config", "ekf.yaml",
-                ]),  
-                {'use_sim_time': use_sim_time}],
-    )
+    #odom_node = Node(
+    #        package='robot_sbem',
+    #        executable='pub_odom_sbem.py',
+    #     )
+    #
+    ## node for robot localization with kalman filter
+    #fusing_node = Node(
+    #        package='robot_localization',
+    #        executable='ekf_node',
+    #        name='ekf_filter_node',
+    #        output='screen',
+    #        parameters=[
+    #            PathJoinSubstitution([
+    #                get_package_share_directory("robot_sbem"),
+    #                "config", "ekf.yaml",
+    #            ]),  
+    #            {'use_sim_time': use_sim_time}],
+    #)
     
     # Create a laser filter node to filter the laser scan from the robot structure
-    laser_filter = Node(
-            package="laser_filters",
-            executable="scan_to_scan_filter_chain",
-            parameters=[
-                PathJoinSubstitution([
-                    get_package_share_directory("robot_sbem"),
-                    "config", "footprint_filter_laser.yaml",
-                ])],
-        )
+    #laser_filter = Node(
+    #        package="laser_filters",
+    #        executable="scan_to_scan_filter_chain",
+    #        parameters=[
+    #            PathJoinSubstitution([
+    #                get_package_share_directory("robot_sbem"),
+    #                "config", "footprint_filter_laser.yaml",
+    #            ])],
+    #    )
     
 
     ros_bridge_server = Node(
@@ -99,10 +101,10 @@ def generate_launch_description():
             default_value='false',
             description='Use sim time if true'),
 
-        node_robot_state_publisher,
-        odom_node,
-        laser_filter,
-        fusing_node,
+        #node_robot_state_publisher,
+        #odom_node,
+        #laser_filter,
+        #fusing_node,
         node_image_republisher,
         ros_bridge_server
     ])
