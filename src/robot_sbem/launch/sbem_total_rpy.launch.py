@@ -2,6 +2,9 @@ import os
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
 
@@ -19,14 +22,33 @@ def generate_launch_description():
             }]
     )
 
-    
-
-    imu_node = Node(
-        package='robot_sbem',
-        executable='imu_publisher.py',
-        name='imu_publisher',
-        output='screen',
+    lidar_filter = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                FindPackageShare('robot_sbem').find('robot_sbem'),
+                'launch',
+                'footprint_filter_laser.launch.py'
+            )
+        ])
     )
+
+
+    ros2_control_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                FindPackageShare('diffdrive_sbem').find('diffdrive_sbem'),
+                'launch',
+                'diffbot.launch.py'
+            )
+        ])
+    )
+
+    # imu_node = Node(
+    #     package='robot_sbem',
+    #     executable='imu_publisher.py',
+    #     name='imu_publisher',
+    #     output='screen',
+    # )
 
     camera_publisher = Node(
             package='v4l2_camera',
@@ -44,24 +66,26 @@ def generate_launch_description():
     #    output='screen',
     #)
 
-    audio_player_node = Node(
-        package='sbem_speaking',
-        executable='tts_sbem.py',
-        output='screen',
-    )
+    #audio_player_node = Node(
+    #    package='sbem_speaking',
+    #    executable='tts_sbem.py',
+    #    output='screen',
+    #)
 
-    audio_listener_node = Node(
-        package='sbem_speaking',
-        executable='wake_stt_sbem_direct_mic.py',
-        output='screen',
-    )
+    #audio_listener_node = Node(
+    #    package='sbem_speaking',
+    #    executable='wake_stt_sbem_direct_mic.py',
+    #    output='screen',
+    #)
 
 
 
     return LaunchDescription([
         lidar,
-        imu_node,
+        #imu_node,
+        lidar_filter,
+        ros2_control_node,
         camera_publisher,
-        audio_listener_node,
-        audio_player_node
+        #audio_listener_node,
+        #audio_player_node
     ])
