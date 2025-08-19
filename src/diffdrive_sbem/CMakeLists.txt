@@ -49,10 +49,7 @@ install(
   DIRECTORY hardware/include/
   DESTINATION include/diffdrive_sbem
 )
-install(
-  DIRECTORY description/launch description/ros2_control description/urdf
-  DESTINATION share/diffdrive_sbem
-)
+
 install(
   DIRECTORY bringup/launch bringup/config
   DESTINATION share/diffdrive_sbem
