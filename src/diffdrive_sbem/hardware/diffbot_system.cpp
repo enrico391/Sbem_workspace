@@ -50,8 +50,8 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
 
   std::cout << "ENC COUNTS PER REV: " << cfg_.enc_counts_per_rev << std::endl;
   
-  wheel_l_.setup(cfg_.left_wheel_name, cfg_.enc_counts_per_rev);
-  wheel_r_.setup(cfg_.right_wheel_name, cfg_.enc_counts_per_rev);
+  wheel_l_.setup(cfg_.left_wheel_name, -1);
+  wheel_r_.setup(cfg_.right_wheel_name, 1);
   
 
   return hardware_interface::CallbackReturn::SUCCESS;
@@ -118,24 +118,21 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
 hardware_interface::return_type DiffBotSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
-  comms_.read_encoder_values(wheel_l_.enc, wheel_r_.enc);
+  comms_.read_encoder_values(wheel_l_.turns, wheel_r_.turns);
 
   double delta_seconds = period.seconds();
 
   double pos_prev = wheel_l_.pos;
-  wheel_l_.pos = wheel_l_.calc_enc_angle();
+  wheel_l_.pos = wheel_l_.update_from_turns();
 
   wheel_l_.vel = (wheel_l_.pos - pos_prev) / delta_seconds;
 
 
   pos_prev = wheel_r_.pos;
-  std::cout << "Wheel R Enc: " << wheel_r_.calc_enc_angle() << std::endl;
-  wheel_r_.pos = wheel_r_.calc_enc_angle();
+  std::cout << "Wheel R pos: " << wheel_r_.turns << std::endl;
+  wheel_r_.pos = wheel_r_.update_from_turns();
   wheel_r_.vel = (wheel_r_.pos - pos_prev) / delta_seconds;
   
-
-  
-
 
   return hardware_interface::return_type::OK;
 }
@@ -145,8 +142,8 @@ hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
 { 
   std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
   
-  double motor_l_counts_per_loop = wheel_l_.cmd / wheel_l_.rads_per_count / cfg_.loop_rate;
-  double motor_r_counts_per_loop = wheel_r_.cmd / wheel_r_.rads_per_count / cfg_.loop_rate;
+  double motor_l_counts_per_loop = wheel_l_.cmd / (2 * M_PI);
+  double motor_r_counts_per_loop = wheel_r_.cmd / (2 * M_PI);
   
   // print for debugging
   std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
