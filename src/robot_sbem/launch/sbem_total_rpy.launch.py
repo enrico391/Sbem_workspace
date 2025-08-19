@@ -72,11 +72,11 @@ def generate_launch_description():
     #    output='screen',
     #)
 
-    #audio_listener_node = Node(
-    #    package='sbem_speaking',
-    #    executable='wake_stt_sbem_direct_mic.py',
-    #    output='screen',
-    #)
+    audio_listener_node = Node(
+        package='sbem_speaking',
+        executable='wake_stt_sbem_direct_mic.py',
+        output='screen',
+    )
 
 
 
@@ -86,6 +86,6 @@ def generate_launch_description():
         lidar_filter,
         ros2_control_node,
         camera_publisher,
-        #audio_listener_node,
+        audio_listener_node,
         #audio_player_node
     ])

@@ -26,7 +26,7 @@ import socket
 import pickle
 import struct
 
-import RPi.GPIO as GPIO
+#import Jetson.GPIO as GPIO
 
 SHORT_NORMALIZE = (1.0/32768.0)
 
@@ -73,6 +73,12 @@ class ProcessAudio(Node):
         self.end = 0
         self.running = True
 
+        # List all available audio input devices
+        self.get_logger().info("Available audio input devices:")
+        for i in range(self.audio.get_device_count()):
+            info = self.audio.get_device_info_by_index(i)
+            self.get_logger().info(f"Device {i}: {info['name']} (Input Channels: {info['maxInputChannels']})")
+
         self.declare_parameters("", [
             ("channels", CHANNELS),
             ("rate", RATE),
@@ -111,9 +117,9 @@ class ProcessAudio(Node):
         self.timer = self.create_timer(0.01, self.process_audio)
 
         # create gpio mode for pin LED
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(22, GPIO.OUT)
-        GPIO.output(22, GPIO.LOW)
+        #GPIO.setmode(GPIO.BCM)
+        #GPIO.setup(22, GPIO.OUT)
+        #GPIO.output(22, GPIO.LOW)
         
         self.get_logger().info(f"-I- {self.nodename} started with direct microphone input")
         
@@ -137,7 +143,7 @@ class ProcessAudio(Node):
         """Start record audio"""
         self.start_record = True
         # set LED ON
-        GPIO.output(22, GPIO.HIGH)
+        #GPIO.output(22, GPIO.HIGH)
 
         self.pub_startAnswer.publish(Bool(data=True))
         self.get_logger().info("Recording...")
@@ -171,7 +177,7 @@ class ProcessAudio(Node):
         self.start_record = False
 
         # set LED OFF
-        GPIO.output(22, GPIO.LOW)
+        #GPIO.output(22, GPIO.LOW)
 
         self.pub_startAnswer.publish(Bool(data=False))
         self.get_logger().info("Recording finished")
@@ -278,7 +284,7 @@ class ProcessAudio(Node):
                     
         except Exception as e:
             # set LED OFF
-            GPIO.output(22, GPIO.LOW)
+            #GPIO.output(22, GPIO.LOW)
             
             self.get_logger().error(f"Error in process_audio: {str(e)}")
             
