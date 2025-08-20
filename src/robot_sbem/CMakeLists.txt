@@ -54,16 +54,6 @@ install(PROGRAMS
 )
 
 
-install(PROGRAMS
-scripts/example_nav_to_pose.py
-DESTINATION lib/${PROJECT_NAME}
-)
-
-install(PROGRAMS
-scripts/yolo5_node.py
-DESTINATION lib/${PROJECT_NAME}
-)
-
 
 
 ament_package()
