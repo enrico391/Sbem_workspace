@@ -143,8 +143,8 @@ hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
   
   double motor_l_counts_per_loop = - wheel_l_.cmd / (2 * M_PI);
-  double motor_r_counts_per_loop = wheel_r_.cmd / (2 * M_PI);
-  
+  double motor_r_counts_per_loop =  wheel_r_.cmd / (2 * M_PI);
+
   // print for debugging
   std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
   std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;

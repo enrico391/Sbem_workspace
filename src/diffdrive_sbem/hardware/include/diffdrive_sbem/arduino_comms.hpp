@@ -96,8 +96,8 @@ public:
     // print for debugging
     //std::cout << "Read encoders: " << token_1 << " " << token_2 << std::endl;
 
-    val_1 = std::atof(token_1.c_str());
-    val_2 = std::atof(token_2.c_str());
+    val_2 = std::atof(token_1.c_str());
+    val_1 = std::atof(token_2.c_str());
   }
   void set_motor_values(float val_1, float val_2)
   {
