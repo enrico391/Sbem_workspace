@@ -179,6 +179,17 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
                         [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
+            # Add cmd_vel to cmd_vel_stamped converter
+            Node(
+                package='twist_stamper',
+                executable='twist_stamper',
+                name='twist_stamper',
+                output='screen',
+                respawn=use_respawn,
+                respawn_delay=2.0,
+                parameters=[{'use_sim_time': use_sim_time}],
+                arguments=['--ros-args', '--log-level', log_level],
+                remappings=[('cmd_vel_in', 'cmd_vel'), ('cmd_vel_out', 'cmd_vel_stamped')]),            
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
