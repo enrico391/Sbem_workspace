@@ -52,7 +52,7 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   
   wheel_l_.setup(cfg_.left_wheel_name, -1);
   wheel_r_.setup(cfg_.right_wheel_name, 1);
-  
+  battery_.setup("battery");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -67,13 +67,15 @@ std::vector<hardware_interface::StateInterface> DiffBotSystemHardware::export_st
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         wheel_l_.name, hardware_interface::HW_IF_VELOCITY, &wheel_l_.vel));
-
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         wheel_r_.name, hardware_interface::HW_IF_POSITION, &wheel_r_.pos));
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         wheel_r_.name, hardware_interface::HW_IF_VELOCITY, &wheel_r_.vel));
+    state_interfaces.emplace_back(
+      hardware_interface::StateInterface(
+        battery_.name, "voltage", &battery_.voltage));
 
 
   return state_interfaces;
@@ -118,7 +120,7 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
 hardware_interface::return_type DiffBotSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
-  comms_.read_encoder_values(wheel_l_.turns, wheel_r_.turns);
+  comms_.read_values(wheel_l_.turns, wheel_r_.turns, battery_.voltage);
 
   double delta_seconds = period.seconds();
 

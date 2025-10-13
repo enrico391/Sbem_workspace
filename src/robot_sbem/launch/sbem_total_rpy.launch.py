@@ -60,6 +60,18 @@ def generate_launch_description():
             }]
     )
 
+    node_republisher_camera = Node(
+        package='image_transport',
+        executable='republish',
+        name='republish_camera',
+        output='screen',
+        arguments=['compressed', 'raw'],
+        remappings=[
+            ('/in/compressed', '/image_raw/compressed'),
+            ('/out', '/image')
+        ]
+    )
+
     #audio_listener_node = Node(
     #    package='audio_common',
     #    executable='audio_capturer_node',
@@ -87,5 +99,6 @@ def generate_launch_description():
         ros2_control_node,
         camera_publisher,
         audio_listener_node,
+        #node_republisher_camera,
         #audio_player_node
     ])
