@@ -32,6 +32,7 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "diffdrive_sbem/arduino_comms.hpp"
 #include "diffdrive_sbem/wheel.hpp"
+#include "diffdrive_sbem/battery.hpp"
 
 namespace diffdrive_sbem
 {
@@ -73,14 +74,13 @@ public:
 
 
 private:
-
-
   // Serial communication object
   ArduinoComms comms_;
   Config cfg_;
 
   Wheel wheel_l_;
   Wheel wheel_r_;
+  Battery battery_;
 };
 
 }  // namespace diffdrive_sbem

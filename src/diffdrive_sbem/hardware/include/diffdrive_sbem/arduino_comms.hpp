@@ -84,7 +84,7 @@ public:
     std::string response = send_msg("\r");
   }
 
-  void read_encoder_values(float &val_1, float &val_2)
+  void read_values(float &val_1, float &val_2, double &voltage)
   {
     std::string response = send_msg("e\r");
 
