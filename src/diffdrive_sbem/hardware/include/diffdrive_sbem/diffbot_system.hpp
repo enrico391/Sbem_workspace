@@ -48,6 +48,7 @@ struct Config
   int baud_rate = 0;
   int timeout_ms = 0;
   int enc_counts_per_rev = 0;
+  std::string battery_name = "";
 };
 
 public:
