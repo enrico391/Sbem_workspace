@@ -8,8 +8,8 @@ class Battery
 {
     public:
 
-    std::string name = "";
-    double voltage = 0;
+    std::string name{""};
+    double voltage{0.0};
 
     Battery() = default;
 

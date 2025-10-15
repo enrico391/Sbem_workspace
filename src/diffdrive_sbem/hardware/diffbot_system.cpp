@@ -47,12 +47,13 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   cfg_.baud_rate =  std::stoi(info_.hardware_parameters["baud_rate"]);
   cfg_.timeout_ms = std::stoi(info_.hardware_parameters["timeout_ms"]);
   cfg_.enc_counts_per_rev = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
+  cfg_.battery_name = info_.hardware_parameters["battery_name"];
 
   std::cout << "ENC COUNTS PER REV: " << cfg_.enc_counts_per_rev << std::endl;
   
   wheel_l_.setup(cfg_.left_wheel_name, -1);
   wheel_r_.setup(cfg_.right_wheel_name, 1);
-  battery_.setup("battery");
+  battery_.setup(cfg_.battery_name);
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -128,7 +129,6 @@ hardware_interface::return_type DiffBotSystemHardware::read(
   wheel_l_.pos = wheel_l_.update_from_turns();
 
   wheel_l_.vel = (wheel_l_.pos - pos_prev) / delta_seconds;
-
 
   pos_prev = wheel_r_.pos;
   std::cout << "Wheel R pos: " << wheel_r_.turns << std::endl;
