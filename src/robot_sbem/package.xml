@@ -12,6 +12,18 @@
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
+  <depend>opennav_docking</depend>
+  <depend>navigation2</depend>
+  <depend>rclcpp</depend>
+  <depend>navigation_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>rviz2</depend>
+  <depend>rosbridge_server</depend>
+  <depend>image_transport</depend>
+  <depend>apriltag_ros</depend>
+
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
