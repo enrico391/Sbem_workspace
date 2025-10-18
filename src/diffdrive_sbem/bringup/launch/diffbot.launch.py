@@ -99,6 +99,7 @@ def generate_launch_description():
             ("~/robot_description", "/robot_description"),
             ("/diffbot_base_controller/cmd_vel", "/cmd_vel_stamped"),
             ("/diffbot_base_controller/odom", "/odom"),
+            ("/battery_state_broadcaster/battery_state", "/battery_state")
         ],
     )
     robot_state_pub_node = Node(
