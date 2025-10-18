@@ -10,6 +10,7 @@ class Battery
 
     std::string name{""};
     double voltage{0.0};
+    double current{0.0};
 
     Battery() = default;
 
