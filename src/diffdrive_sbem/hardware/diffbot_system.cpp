@@ -77,6 +77,9 @@ std::vector<hardware_interface::StateInterface> DiffBotSystemHardware::export_st
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         battery_.name, "voltage", &battery_.voltage));
+    state_interfaces.emplace_back(
+      hardware_interface::StateInterface(
+        battery_.name, "current", &battery_.current));
 
 
   return state_interfaces;
@@ -121,7 +124,7 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
 hardware_interface::return_type DiffBotSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
-  comms_.read_values(wheel_l_.turns, wheel_r_.turns, battery_.voltage);
+  comms_.read_values(wheel_l_.turns, wheel_r_.turns, battery_.voltage, battery_.current);
 
   double delta_seconds = period.seconds();
 
