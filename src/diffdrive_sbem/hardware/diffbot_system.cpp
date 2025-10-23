@@ -134,7 +134,7 @@ hardware_interface::return_type DiffBotSystemHardware::read(
   wheel_l_.vel = (wheel_l_.pos - pos_prev) / delta_seconds;
 
   pos_prev = wheel_r_.pos;
-  std::cout << "Wheel R pos: " << wheel_r_.turns << std::endl;
+  //std::cout << "Wheel R pos: " << wheel_r_.turns << std::endl;
   wheel_r_.pos = wheel_r_.update_from_turns();
   wheel_r_.vel = (wheel_r_.pos - pos_prev) / delta_seconds;
   
@@ -145,14 +145,14 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 { 
-  std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
+  //std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
   
   double motor_l_counts_per_loop = - wheel_l_.cmd / (2 * M_PI);
   double motor_r_counts_per_loop =  wheel_r_.cmd / (2 * M_PI);
 
   // print for debugging
-  std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
-  std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;
+  //std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
+  //std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;
 
   comms_.set_motor_values(static_cast<float>(motor_l_counts_per_loop), static_cast<float>(motor_r_counts_per_loop));
 
