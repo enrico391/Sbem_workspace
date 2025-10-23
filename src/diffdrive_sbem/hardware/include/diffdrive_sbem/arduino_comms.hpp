@@ -85,7 +85,7 @@ public:
     std::string response = send_msg("\r");
   }
 
-  void read_values(float &val_1, float &val_2, double &voltage, double &current)
+  void read_values(float &left_value, float &right_value, double &voltage, double &current)
   {
     std::string response = send_msg("e\r");
 
@@ -109,9 +109,8 @@ public:
     // std::string val1 = second_part.substr(0, del_pos);
     // std::string voltage_string = second_part.substr(del_pos + delimiter.length());
     
-
-    val_2 = values[0];
-    val_1 = values[1];
+    left_value = values[0];
+    right_value = values[1];
     voltage = values[2];
     current = values[3];
   }
