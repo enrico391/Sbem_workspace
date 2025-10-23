@@ -154,7 +154,7 @@ hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
   std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;
 
-  comms_.set_motor_values((float)motor_l_counts_per_loop, (float)motor_r_counts_per_loop);
+  comms_.set_motor_values(static_cast<float>(motor_l_counts_per_loop), static_cast<float>(motor_r_counts_per_loop));
 
   return hardware_interface::return_type::OK;
 }
