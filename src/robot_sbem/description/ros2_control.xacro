@@ -33,6 +33,7 @@
             <!--battery sensor-->
             <sensor name="battery_state">
                 <state_interface name="voltage" />
+                <state_interface name="current" />
             </sensor>
         </ros2_control>
     </xacro:unless>
