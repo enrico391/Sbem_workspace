@@ -10,32 +10,29 @@ class Wheel
     public:
 
     std::string name = "";
-    float enc = 0;
     double cmd = 0;
     double pos = 0;
     double vel = 0;
-    double rads_per_count = 0;
+    float turns = 0;
+    int reverse = 1; // 1 for normal, -1 for reverse
 
     Wheel() = default;
 
-    Wheel(const std::string &wheel_name, int counts_per_rev)
+    Wheel(const std::string &wheel_name, int rev)
     {
-      setup(wheel_name, counts_per_rev);
+      setup(wheel_name, rev);
     }
 
-    
-    void setup(const std::string &wheel_name, int counts_per_rev)
+    void setup(const std::string &wheel_name, int rev)
     {
+      reverse = rev;
       name = wheel_name;
-      rads_per_count = (2*M_PI)/counts_per_rev;
     }
 
-    double calc_enc_angle()
+    double update_from_turns()
     {
-      return enc * rads_per_count;
+      return turns * 2 * M_PI * reverse;
     }
-
-
 
 };
 

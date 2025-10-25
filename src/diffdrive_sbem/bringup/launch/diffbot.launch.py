@@ -99,6 +99,7 @@ def generate_launch_description():
             ("~/robot_description", "/robot_description"),
             ("/diffbot_base_controller/cmd_vel", "/cmd_vel_stamped"),
             ("/diffbot_base_controller/odom", "/odom"),
+            ("/battery_state_broadcaster/battery_state", "/battery_state")
         ],
     )
     robot_state_pub_node = Node(
@@ -128,6 +129,12 @@ def generate_launch_description():
         arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
     )
 
+    battery_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["battery_state_broadcaster"],
+    )
+
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -149,6 +156,7 @@ def generate_launch_description():
         control_node,
         robot_state_pub_node,
         robot_controller_spawner,
+        battery_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_controller_spawner,
     ]

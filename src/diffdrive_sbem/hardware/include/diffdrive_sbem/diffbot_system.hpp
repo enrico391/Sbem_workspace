@@ -32,6 +32,7 @@
 #include "rclcpp_lifecycle/state.hpp"
 #include "diffdrive_sbem/arduino_comms.hpp"
 #include "diffdrive_sbem/wheel.hpp"
+#include "diffdrive_sbem/battery.hpp"
 
 namespace diffdrive_sbem
 {
@@ -47,6 +48,7 @@ struct Config
   int baud_rate = 0;
   int timeout_ms = 0;
   int enc_counts_per_rev = 0;
+  std::string battery_name = "";
 };
 
 public:
@@ -73,14 +75,13 @@ public:
 
 
 private:
-
-
   // Serial communication object
   ArduinoComms comms_;
   Config cfg_;
 
   Wheel wheel_l_;
   Wheel wheel_r_;
+  Battery battery_;
 };
 
 }  // namespace diffdrive_sbem

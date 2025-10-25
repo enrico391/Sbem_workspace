@@ -4,6 +4,7 @@
 // #include <cstring>
 #include <sstream>
 // #include <cstdlib>
+#include <vector>
 #include <libserial/SerialPort.h>
 #include <iostream>
 
@@ -84,20 +85,34 @@ public:
     std::string response = send_msg("\r");
   }
 
-  void read_encoder_values(float &val_1, float &val_2)
+  void read_values(float &left_value, float &right_value, double &voltage, double &current)
   {
     std::string response = send_msg("e\r");
 
-    std::string delimiter = " ";
-    size_t del_pos = response.find(delimiter);
-    std::string token_1 = response.substr(0, del_pos);
-    std::string token_2 = response.substr(del_pos + delimiter.length());
-    
-    // print for debugging
-    //std::cout << "Read encoders: " << token_1 << " " << token_2 << std::endl;
+    //std::string delimiter = " ";
 
-    val_1 = std::atof(token_1.c_str());
-    val_2 = std::atof(token_2.c_str());
+    // get stream from the message
+    std::istringstream iss(response);
+
+    std::vector<float> values;
+    float number;
+
+    // put values inside the vector
+    while (iss >> number) {
+        values.push_back(number);
+    }
+
+    // size_t del_pos = response.find(delimiter);
+    // std::string val2 = response.substr(0, del_pos);
+    // std::string second_part = response.substr(del_pos + delimiter.length());
+    // del_pos = second_part.find(delimiter);
+    // std::string val1 = second_part.substr(0, del_pos);
+    // std::string voltage_string = second_part.substr(del_pos + delimiter.length());
+    
+    right_value = values[0];
+    left_value = values[1];
+    voltage = values[2];
+    current = values[3];
   }
   void set_motor_values(float val_1, float val_2)
   {

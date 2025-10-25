@@ -12,7 +12,7 @@
 
 
             <!-- Limits -->
-            <max_wheel_torque>200</max_wheel_torque>
+            <max_wheel_torque>100</max_wheel_torque>
             <max_wheel_acceleration>10.0</max_wheel_acceleration>
 
             
