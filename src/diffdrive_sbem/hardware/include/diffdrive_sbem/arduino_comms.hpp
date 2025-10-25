@@ -109,8 +109,8 @@ public:
     // std::string val1 = second_part.substr(0, del_pos);
     // std::string voltage_string = second_part.substr(del_pos + delimiter.length());
     
-    left_value = values[0];
-    right_value = values[1];
+    right_value = values[0];
+    left_value = values[1];
     voltage = values[2];
     current = values[3];
   }
