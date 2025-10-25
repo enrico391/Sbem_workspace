@@ -16,7 +16,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(os.path.join(
             get_package_share_directory('robot_sbem'), 
             'launch', 
-            'localization_launch.py'))
+            'localization.launch.py'))
     )
 
     navigation_node = IncludeLaunchDescription(
