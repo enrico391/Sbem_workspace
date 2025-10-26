@@ -31,7 +31,7 @@ def generate_launch_description():
     bringup_dir = get_package_share_directory('robot_sbem')
 
     namespace = LaunchConfiguration('namespace')
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     autostart = LaunchConfiguration('autostart')
     params_file = LaunchConfiguration('params_file')
     use_composition = LaunchConfiguration('use_composition')
@@ -53,10 +53,12 @@ def generate_launch_description():
     # https://github.com/ros/geometry2/issues/32
     # https://github.com/ros/robot_state_publisher/pull/30
     # TODO(orduno) Substitute with `PushNodeRemapping`
-    #              https://github.com/ros2/launch_ros/issues/56  
+    #              https://github.com/ros2/launch_ros/issues/56
+    
     
     remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+                  ('/tf_static', 'tf_static'),
+                  ('/cmd_vel', '/diffbot_base_controller/cmd_vel_unstamped')]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {

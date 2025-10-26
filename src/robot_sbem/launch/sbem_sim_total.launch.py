@@ -8,7 +8,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
-
+from launch.substitutions import LaunchConfiguration, Command
 
 
 def generate_launch_description():
@@ -16,11 +16,29 @@ def generate_launch_description():
 
     pkg_dir = get_package_share_directory(package_name)
 
-    rsp = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory(package_name),'launch','sbem.launch.py'
-                )]), launch_arguments={'use_sim_time': 'true'}.items()
+    # rsp = IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([os.path.join(
+    #                 get_package_share_directory(package_name),'launch','sbem.launch.py'
+    #             )]), launch_arguments={'use_sim_time': 'true'}.items()
+    # )
+
+    # Check if we're told to use sim time
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    use_ros2_control = LaunchConfiguration('use_ros2_control', default='true')
+
+    pkg_path = os.path.join(get_package_share_directory('robot_sbem'))
+    xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro') #xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro')
+    robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time])
+    
+    # Create a robot_state_publisher node
+    params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
+    node_robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[params]
     )
+
 
     gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
 
@@ -51,14 +69,14 @@ def generate_launch_description():
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["diff_cont"]
+        arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
         #remappings=[('/cmd_vel_unstamped','/cmd_vel')]
     )
 
     joint_broad_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_broad"],
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
     # Launch the footprint filter node to filter laser scans
@@ -85,7 +103,7 @@ def generate_launch_description():
 
     # Launch them all!
     return LaunchDescription([
-        rsp,
+        node_robot_state_publisher,
         gazebo,
         spawn_entity,
         diff_drive_spawner,
