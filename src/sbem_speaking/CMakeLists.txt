@@ -31,6 +31,12 @@ if(BUILD_TESTING)
 endif()
 
 
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+
 install(PROGRAMS
 scripts/wake_stt_sbem_direct_mic.py
 DESTINATION lib/${PROJECT_NAME}
