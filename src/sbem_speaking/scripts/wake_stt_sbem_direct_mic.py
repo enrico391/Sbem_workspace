@@ -33,7 +33,11 @@ SHORT_NORMALIZE = (1.0/32768.0)
 TIMEOUT_LENGTH = 3
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
+<<<<<<< HEAD
 RATE = 44100
+=======
+RATE = 16000
+>>>>>>> 752168c14e635f737c23ce9ff3afb8585ef35271
 CHUNK = 1024  # Number of audio frames per buffer
 WAKE_WORD_THRESHOLD = 0.3
 RMS_THRESHOLD = 30
