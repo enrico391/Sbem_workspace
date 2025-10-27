@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<robot name="robot_sbem" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    
+    <link name="dept_camera">
+        <visual>
+          <origin xyz="-0.055401 0.183493 -1.101683" rpy="0 0 0"/> 
+          <!-- <geometry>
+            <mesh filename="file://$(find robot_sbem)/description/meshes/dept_camera_1.stl" scale="0.001 0.001 0.001"/>
+          </geometry> -->
+          <geometry>
+            <box size="0.010 0.03 0.03"/>
+          </geometry>
+          <material name="white"/>
+        </visual>
+      </link>
+
+
+    <joint name="joint_dept_camera" type="fixed">
+      <origin xyz="0.21 -0 0.30" rpy="0 0 0"/>
+      <parent link="upper_body"/>
+      <child link="dept_camera"/>
+    </joint>
+
+    <joint name="camera_optical_joint_depth" type="fixed">
+      <parent link="dept_camera"/>
+      <child link="camera_link_optical_depth"/>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+    </joint>
+
+    <link name="camera_link_optical_depth"></link>
+
+
+    <gazebo reference="dept_camera">
+      <material>Gazebo/Red</material>
+
+      <sensor name="camera" type="depth">
+          <pose> 0 0 0 0 0 0 </pose>
+          <visualize>true</visualize>
+          <update_rate>10</update_rate>
+          <camera>
+              <horizontal_fov>1.089</horizontal_fov>
+              <image>
+                  <format>B8G8R8</format>
+                  <width>640</width>
+                  <height>480</height>
+              </image>
+              <clip>
+                  <near>0.05</near>
+                  <far>8.0</far>
+              </clip>
+          </camera>
+          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+              <frame_name>camera_link_optical_depth</frame_name>
+              <min_depth>0.1</min_depth>
+              <max_depth>100.0</max_depth>
+          </plugin>
+      </sensor>
+  </gazebo>
+
+
+</robot>
