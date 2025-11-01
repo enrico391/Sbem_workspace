@@ -1,82 +1,108 @@
 #!/usr/bin/env python3
 
-
 import rclpy
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 
 from std_msgs.msg import String
 from std_msgs.msg import Bool
-
-
-import queue
-import re
-import threading
-
-
-import sounddevice as sd
+import pyaudio
 import numpy as np
-import time
+
 import math
 import struct
-import os
-from datetime import datetime
-import struct
+import sounddevice as sd
+
+import openwakeword
+from openwakeword.model import Model
 from faster_whisper import WhisperModel
 
+import struct
+import soxr
+#import Jetson.GPIO as GPIO
 
 SHORT_NORMALIZE = (1.0/32768.0)
+
 TIMEOUT_LENGTH = 3
-WAKE_WORD_THRESHOLD = 0
-RMS_THRESHOLD = 1000  # Adjust this threshold based on your environment
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+CHUNK = 1280  # Number of audio frames per buffer
+WAKE_WORD_THRESHOLD = 0.3
+RMS_THRESHOLD = 30
+
+openwakeword.utils.download_models()
 
 class ProcessAudio(Node):
 
     def __init__(self):
-        super().__init__("PorcupineCheetahMicrophoneNode")
-        self.nodename = "PorcupineCheetahMicrophoneNode"
-
-        self.declare_parameter("index_mic", -1)
-        self.declare_parameter("use_wake_word", False)
-        self.declare_parameter("whisper_model_size", "base.en")
-        self.declare_parameter("device_index", 0)
-        self.declare_parameter("rate", 41000)
-        self.declare_parameter("chunk", 2048)
-        self.declare_parameter("nb_channels", 1)
-
-        print(sd.query_devices())
-
-        # initialize wake word only if parameter is set to true
-        if self.get_parameter("use_wake_word").get_parameter_value().bool_value:
-            pass
-            
-        # initialize recorder and whisper STT
-        self.get_logger().info("Initialing")
-        try:
-            if self.get_parameter("use_wake_word").get_parameter_value().bool_value:
-                pass
-
-            self.whisper = WhisperModel("tiny", device="cpu", compute_type="int8", cpu_threads=4)
-
-        except Exception as e:
-            self.get_logger().error(f"Error initializing whisper model: {str(e)}")
-            return
-
+        super().__init__("processAudio")
+        self.nodename = "processAudio"
+        
+        self.model = WhisperModel("base", device="cpu", compute_type="int8")
+        self.model_wake_word = Model(wakeword_models=["jarvis"],inference_framework="tflite")
 
         self.start_record = False
+        self.audio = pyaudio.PyAudio()
+        self.data_audio = None
         self.current = 0
+        self.rec = []
+        self.frames = []
         self.end = 0
 
-        self.current_transcript = ""
-        self.volume = 0
+        # List all available audio input devices
+        # self.get_logger().info("Available audio input devices:")
+        # for i in range(self.audio.get_device_count()):
+        #     info = self.audio.get_device_info_by_index(i)
+        #     self.get_logger().info(f"Device {i}: {info['name']} (Input Channels: {info['maxInputChannels']})")
+
+        self.declare_parameters("", [
+            ("channels", CHANNELS),
+            ("rate", RATE),
+            ("device", 0),
+            ("format", FORMAT)
+        ])
+
+        self.channels = self.get_parameter(
+            "channels").get_parameter_value().integer_value
+        self.rate = self.get_parameter(
+            "rate").get_parameter_value().integer_value
+        self.device = self.get_parameter(
+            "device").get_parameter_value().integer_value
+        self.format = self.get_parameter(
+            "format").get_parameter_value().integer_value
+
+        if self.device < 0:
+            self.device = None
+
+        # Initialize PyAudio microphone stream
+        self.mic_stream = self.audio.open(
+            format=self.format,
+            channels=self.channels,
+            rate=self.rate,
+            input=True,
+            frames_per_buffer=CHUNK,
+            input_device_index=self.device
+        )
+
+        # resampler for transform 44.1kHz to 16kHz 
+        self.resampler = soxr.ResampleStream(
+            RATE,              # input samplerate
+            16000,              # target samplerate
+            1,                  # channel(s)
+            dtype='int16'       # data type (default = 'float32')
+        )
 
         # for publish question of the user to ros
-        self.pub_tts = self.create_publisher(String, "/user_input", 1)
-        #queue for audio data
-        self.audio_queue = queue.Queue()
+        self.pub_tts = self.create_publisher(String, "/user_input", 10)
 
-        threading.Thread(target=self.listen_audio, daemon=True).start()
-        threading.Thread(target=self.process_recording, daemon=True).start()
+        # Create a timer for processing audio
+        self.timer = self.create_timer(0.01, self.process_audio)
+
+        # create gpio mode for pin LED
+        #GPIO.setmode(GPIO.BCM)
+        #GPIO.setup(22, GPIO.OUT)
+        #GPIO.output(22, GPIO.LOW)
         self.get_logger().info(f"-I- {self.nodename} started with direct microphone input")
         
 
@@ -84,99 +110,171 @@ class ProcessAudio(Node):
         """Calculate rms of audio data"""
         count = len(frame) / 2
         format = "%dh" % (count)
-        #shorts = struct.unpack(format, frame)
+        shorts = struct.unpack(format, frame)
 
         sum_squares = 0.0
-        for sample in frame:
+        for sample in shorts:
             n = sample * SHORT_NORMALIZE
             sum_squares += n * n
         rms = math.pow(sum_squares / count, 0.5)
-
+        self.get_logger().info(f"RMS: {rms * 1000}")
         return rms * 1000
 
     def start_recording(self):
         """Start record audio"""
         self.start_record = True
-    
+        # set LED ON
+        #GPIO.output(22, GPIO.HIGH)
         self.get_logger().info("Recording...")
         
         # Initialize recording variables
+        self.rec = []
         current_time = self.get_clock().now().seconds_nanoseconds()[0]
         self.current_time = current_time
         self.end = current_time + TIMEOUT_LENGTH
 
-
     def process_recording(self, audio_data):
-        """Function to check if user is still talking"""
+        """Function to check if sound is active and store audio data"""
         # Check if sound is still active
-        if self.volume >= RMS_THRESHOLD:
+        if self.rms(audio_data) >= RMS_THRESHOLD:
             self.end = self.get_clock().now().seconds_nanoseconds()[0] + TIMEOUT_LENGTH
         
         # Update current time
         self.current = self.get_clock().now().seconds_nanoseconds()[0]
-
-        # transcribe with cheetah in real-time
-        partial_transcript, is_endpoint = self.cheetah.process(audio_data)
-        self.current_transcript += partial_transcript
-        self.get_logger().info(f"Partial transcript: {self.current_transcript}")
         
-        # if cheetah detect the end of the query, send final message
-        if is_endpoint:
-            self.current_transcript += self.cheetah.flush()
-            self.start_record = False
-
-            self.get_logger().info(f"Final transcript: {self.current_transcript}")
-            self.send_message(self.current_transcript)
-            
-
-    def send_message(self, query: str):
-        """Send data over ros""" 
-        msg = String()
-        msg.data = self.current_transcript
-        # reset current transcript
-        self.current_transcript = ""
-
-        self.pub_tts.publish(msg)
-
+        # Add audio data to recording
+        self.rec.append(audio_data)
 
     def finish_recording(self):
         """Function to finish recording and process the audio data"""
-        self.send_message(self.current_transcript)
-    
-
-    def audio_callback(self, indata, frames, time, status):
-        """Callback function to process audio data from microphone"""
-        if status:
-            self.get_logger().warning(f"Audio callback status: {status}")
+        if self.rec:  # Check if there is any recorded audio
+            audio_data = b''.join(self.rec)
+            # transcribe the audio
+            self.transcribe_from_memory(audio_data)
+            self.rec = []  # Clear the buffer
         
-        #get volume
-        volume = np.linalg.norm(indata) * 10
-        self.get_logger().info(f"Volume: {volume}")
+        self.start_record = False
 
-        if volume >= RMS_THRESHOLD:
-            self.audio_queue.put(audio_data)
-            audio_data += pcm
-            audio_queue.put(audio_data)
+        # set LED OFF
+        #GPIO.output(22, GPIO.LOW)
+        self.get_logger().info("Recording finished")
 
+    def transcribe_from_memory(self, audio_data):
+        """Transcribe audio data from memory and publish the result over ROS topic"""
+        try:
+            # Convert audio bytes to numpy array
+            audio_np = np.frombuffer(audio_data, dtype=np.int16)
+            
+            segments, _ = self.model.transcribe(audio_np,language='en', beam_size=5)
+            
+            # Publish to ROS topic
+            for segment in segments:
+                transcript = segment.text
+                self.get_logger().info(f"Transcribed Text: {transcript}")
+            # Check if we have enough audio data
+            # if len(audio_np) < 1000:  # Minimum required length
+            #     self.get_logger().warning("Audio recording too short, ignoring")
+            #     return False
+                
+            # # Audio needs to be normalized to float32 in range [-1, 1]
+            # audio_float = audio_np.astype(np.float32) / 32768.0
+            
+            # self.get_logger().info("Transcribing audio...")
+            
+            # # Transcribe with websocket server
+            # data = pickle.dumps(audio_float)
+            # # Send length of data first
+            # self.sock.sendall(len(data).to_bytes(4, byteorder='big'))
+            # self.sock.sendall(data)
+            # self.get_logger().info("Sent audio_float to server.")
+            
+            #segments, _ = self.model.transcribe(audio_float, beam_size=5)
+            
+            # --- Receive response from server ---
+            # First, receive the length of the response (4 bytes)
+            # response_len_bytes = self.sock.recv(4)
+            # if len(response_len_bytes) < 4:
+            #     self.get_logger().error("Failed to receive response length from server.")
+            #     return False
+            # response_len = int.from_bytes(response_len_bytes, byteorder='big')
 
-    def listen_audio(self):
-        """Listen audio data from the microphone"""
-        with sd.InputStream(channels=self.get_parameter("nb_channels").get_parameter_value().integer_value,
-                            samplerate=self.get_parameter("rate").get_parameter_value().integer_value,
-                            device=self.get_parameter("device_index").get_parameter_value().integer_value,
-                            callback=self.audio_callback):
-            while True:
-                pass
+            # # Now receive the actual response data
+            # response_data = b''
+            # while len(response_data) < response_len:
+            #     packet = self.sock.recv(response_len - len(response_data))
+            #     if not packet:
+            #         break
+            #     response_data += packet
+
+            # if len(response_data) != response_len:
+            #     self.get_logger().error("Incomplete response received from server.")
+            #     return False
+
+            # # Unpickle the response (assuming it's a string or object)
+            # transcribed_text = pickle.loads(response_data)
+            # self.get_logger().info(f"Received transcription: {transcribed_text}")
+
+            
+            # if transcribed_text.strip():
+            #     # Publish transcript
+            #     msg_text = String()
+            #     msg_text.data = transcribed_text.strip()
+            #     self.pub_tts.publish(msg_text)
+            #     return True
+            # else:
+            #     self.get_logger().warning("No transcription produced")
+            #     return False
         
-    
+        except Exception as e:
+            self.get_logger().error(f"Error transcribing: {str(e)}")
+            return False
+
+    def process_audio(self):
+        """Process audio data from the microphone"""
+        
+        try:
+            self.get_logger().debug("Listening for wake word...")
+            self.data_audio = self.mic_stream.read(CHUNK, exception_on_overflow=False)
+
+            # Convert audio data to numpy array for processing
+            audio_np = np.frombuffer(self.data_audio, dtype=np.int16)
+
+            resempled_audio = self.resampler.resample_chunk(audio_np)
+            
+            # Calculate prediction for wake word
+            prediction = self.model_wake_word.predict(resempled_audio)
+            
+            # Calculate current score for wake word
+            scores = list(self.model_wake_word.prediction_buffer["jarvis"])
+                
+            curr_score = float(format(scores[-1], '.6f').replace("-", ""))
+            self.get_logger().debug(f"Wake word scores buffer: {curr_score}")
+            # Debug output but not on every frame (too verbose)
+            if curr_score > 0.3:  # Only show scores that are somewhat significant
+                self.get_logger().debug(f"Wake word confidence: {curr_score:.6f}")
+            
+            # Check if score for wake word is high and flag is ok and start recording
+            if curr_score > WAKE_WORD_THRESHOLD and not self.start_record:
+                self.get_logger().info(f"Wake word detected with confidence {curr_score:.6f}")
+                self.start_recording()
+            
+            # Process recording if active
+            if self.start_record:
+                if self.current <= self.end:
+                    self.process_recording(self.data_audio)
+                else:
+                    self.finish_recording()
+                    
+        except Exception as e:
+            # set LED OFF
+            #GPIO.output(22, GPIO.LOW)
+            
+            self.get_logger().error(f"Error in process_audio: {str(e)}")
+            
+
     def destroy_node(self):
         """Clean up when node is destroyed"""
-        self.get_logger().info("Shutting down ProcessAudio node...")
-        
-        if self.get_parameter("use_wake_word").get_parameter_value().bool_value:
-            pass
-
-
+        self.mic_stream.delete()
         super().destroy_node()
 
 def main(args=None):

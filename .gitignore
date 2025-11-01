@@ -2,3 +2,5 @@ install/*
 log/*
 build/*
 venv/*
+.vscode/*
+models/*
