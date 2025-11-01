@@ -43,8 +43,6 @@ class AudioPlayerNode(Node):
         # variable for interrupting the playback
         self.interrupt_playback = False
 
-        
-
         # subscribe to the response from the agent
         self.sub = self.create_subscription(
             String, "/response_to_user", self.audio_callback, qos_profile_sensor_data)
