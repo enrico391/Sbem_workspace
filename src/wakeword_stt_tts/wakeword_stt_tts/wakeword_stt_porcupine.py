@@ -6,15 +6,10 @@ from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 
 from std_msgs.msg import String
-from std_msgs.msg import Bool
 
 import numpy as np
-import time
 import math
-import struct
 import os
-from datetime import datetime
-import struct
 
 from pvrecorder import PvRecorder
 import pvporcupine

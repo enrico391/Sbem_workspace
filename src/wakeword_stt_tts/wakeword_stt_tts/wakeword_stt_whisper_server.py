@@ -5,21 +5,17 @@ from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 
 from std_msgs.msg import String
-from std_msgs.msg import Bool
 import pyaudio
 import numpy as np
 
 import math
 import struct
-import sounddevice as sd
-from faster_whisper import WhisperModel
 import openwakeword
 from openwakeword.model import Model
-import os
 import struct
 import soxr
-
-#import Jetson.GPIO as GPIO
+import socket
+import pickle
 
 SHORT_NORMALIZE = (1.0/32768.0)
 
@@ -39,7 +35,6 @@ class ProcessAudio(Node):
         super().__init__("processAudio")
         self.nodename = "processAudio"
         
-        self.model = WhisperModel("small", device="cpu", compute_type="int8")
         self.model_wake_word = Model(wakeword_models=["jarvis"],inference_framework="tflite")
 
         self.start_record = False
@@ -60,7 +55,8 @@ class ProcessAudio(Node):
             ("channels", CHANNELS),
             ("rate", RATE),
             ("device", 0),
-            ("format", FORMAT)
+            ("format", FORMAT),
+            ("on_device", False)
         ])
 
         self.channels = self.get_parameter(
@@ -71,6 +67,8 @@ class ProcessAudio(Node):
             "device").get_parameter_value().integer_value
         self.format = self.get_parameter(
             "format").get_parameter_value().integer_value
+        self.on_device = self.get_parameter(
+            "on_device").get_parameter_value().bool_value
 
         if self.device < 0:
             self.device = None
@@ -85,7 +83,7 @@ class ProcessAudio(Node):
             input_device_index=self.device
         )
 
-        # resampler for transform 44.1kHz to 16kHz
+        # resampler for transform RATE to 16kHz
         if self.rate != 16000:
             self.resampler = soxr.ResampleStream(
                 RATE,              # input samplerate
@@ -94,16 +92,29 @@ class ProcessAudio(Node):
                 dtype='int16'       # data type (default = 'float32')
             )
 
+        ## Initialize socket client to connect to STT server
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if self.on_device:
+            self.server_address = ('0.0.0.0', 8765)  # Replace SERVER_IP with your server's IP
+        else:
+            self.server_address = ('192.168.178.176', 8765)  # Replace SERVER_IP with your server's IP
+        
+        try:
+            while(self.sock.connect_ex(self.server_address) != 0):
+                self.get_logger().info("Waiting for STT server to be available...")
+        
+            self.get_logger().info("Socket client connected to server.")
+	
+        except Exception as e:
+            self.get_logger().error(f"Socket connection failed: {e}")
+
+
         # for publish question of the user to ros
         self.pub_tts = self.create_publisher(String, "/user_input", 10)
 
         # Create a timer for processing audio
         self.timer = self.create_timer(0.01, self.process_audio)
 
-        # create gpio mode for pin LED
-        #GPIO.setmode(GPIO.BCM)
-        #GPIO.setup(22, GPIO.OUT)
-        #GPIO.output(22, GPIO.LOW)
         self.get_logger().info(f"-I- {self.nodename} started with direct microphone input")
         
 
@@ -165,18 +176,50 @@ class ProcessAudio(Node):
         try:
             # Convert audio bytes to numpy array
             audio_np = np.frombuffer(audio_data, dtype=np.int16)
-            audio_float = audio_np.astype(np.float32) / 32768.0
 
-            segments, _ = self.model.transcribe(audio_float,
-                                                language='it',
-                                                beam_size=5,
-                                                vad_filter=True,
-                                                vad_parameters=dict(min_silence_duration_ms=1000))
+            if self.rate != 16000:
+                audio_np = self.resampler.resample_chunk(audio_np)
             
-            # Publish to ROS topic
-            for segment in segments:
-                transcript = segment.text
-                self.get_logger().info(f"Transcribed Text: {transcript}")
+            # Check if we have enough audio data
+            if len(audio_np) < 1000:  # Minimum required length
+                self.get_logger().warning("Audio recording too short, ignoring")
+                return False
+                
+            # Audio needs to be normalized to float32 in range [-1, 1]
+            audio_float = audio_np.astype(np.float32) / 32768.0
+            
+            self.get_logger().info("Transcribing audio...")
+            
+            # Transcribe with websocket server
+            data = pickle.dumps(audio_float)
+            # Send length of data first
+            self.sock.sendall(len(data).to_bytes(4, byteorder='big'))
+            self.sock.sendall(data)
+            self.get_logger().info("Sent audio_float to server.")
+            
+            # --- Receive response from server ---
+            # First, receive the length of the response (4 bytes)
+            response_len_bytes = self.sock.recv(4)
+            if len(response_len_bytes) < 4:
+                self.get_logger().error("Failed to receive response length from server.")
+                return False
+            response_len = int.from_bytes(response_len_bytes, byteorder='big')
+
+            # Now receive the actual response data
+            response_data = b''
+            while len(response_data) < response_len:
+                packet = self.sock.recv(response_len - len(response_data))
+                if not packet:
+                    break
+                response_data += packet
+
+            if len(response_data) != response_len:
+                self.get_logger().error("Incomplete response received from server.")
+                return False
+
+            # Unpickle the response (assuming it's a string or object)
+            transcribed_text = pickle.loads(response_data)
+            self.get_logger().info(f"Received transcription: {transcribed_text}")
             
         
         except Exception as e:

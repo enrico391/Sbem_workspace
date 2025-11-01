@@ -17,12 +17,12 @@ class AudioTranscriptionServer(Node):
     def __init__(self):
         super().__init__('audio_transcription_server')
         self.pub = self.create_publisher(String, '/user_input', 10)
-        self.get_logger().info("AudioTranscriptionServer node started.")
-
+    
         self.model = WhisperModel("base", device="cpu", compute_type="int8")
 
         self.server_thread = threading.Thread(target=self.run_server, daemon=True)
         self.server_thread.start()
+        self.get_logger().info("AudioTranscriptionServer node started.")
 
     def run_server(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

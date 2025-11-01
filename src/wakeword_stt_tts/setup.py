@@ -10,15 +10,20 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (('share/' + package_name + '/launch'), ['launch/wakeword_stt_tts.launch.py']),
+        (('share/' + package_name + '/launch'), ['launch/wakeword_stt_on_device.launch.py']),
+        (('share/' + package_name + '/launch'), ['launch/wakeword_stt_on_server.launch.py']),
 
     ],
     install_requires=[
-        'setuptools',
         'pvporcupine',
         'pvcheetah',
         'pvrecorder',
         'pyaudio',
+        'soxr',
+        'faster-whisper',
+        'openwakeword',
+        'gTTS',
+        'numpy<1.25.0'
         ],
     zip_safe=True,
     maintainer='morowsl',
@@ -32,8 +37,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'wakeword_stt.py = wakeword_stt_tts.wakeword_stt:main',
-            'tts_server.py = wakeword_stt_tts.tts_server:main',
+            'wakeword_stt_whisper_server = wakeword_stt_tts.wakeword_stt_whisper_server:main',
+            'tts_server = wakeword_stt_tts.tts_server:main',
+            'stt_server = wakeword_stt_tts.stt_server:main',
         ],
     },
 )

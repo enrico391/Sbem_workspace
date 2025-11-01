@@ -8,29 +8,25 @@ def generate_launch_description():
     
     wake_record_mic_node = Node(
             package="wakeword_stt_tts",
-            executable="wakeword_stt",
-            name="wake_record_mic",
-            output="screen",
-            parameters=[{
-                "index_mic": -1,
-                "use_wake_word": False
-            }]
-        )
-
-    tts_server_node = Node(
-            package="wakeword_stt_tts",
-            executable="tts_server",
-            name="tts_server",
+            executable="wakeword_stt_whisper_server",
+            name="wakeword_stt_whisper_server",
             output="screen",
             parameters=[{
                 "channels": 1,
-                "device": 24,
-                "useLocalTTS": False,
-                "typeLocalTTS": "coqui"
+                "rate": 44100,
+                "device": 0,
+                "on_device": True                
             }]
+        )
+
+    stt_server = Node(
+            package="wakeword_stt_tts",
+            executable="stt_server",
+            name="stt_server",
+            output="screen",
     )
     
     return LaunchDescription([
         wake_record_mic_node,
-        tts_server_node
+        stt_server
     ])
