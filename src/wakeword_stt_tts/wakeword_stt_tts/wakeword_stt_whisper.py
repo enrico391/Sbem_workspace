@@ -12,13 +12,13 @@ import numpy as np
 import math
 import struct
 import sounddevice as sd
-
+from faster_whisper import WhisperModel
 import openwakeword
 from openwakeword.model import Model
-from faster_whisper import WhisperModel
-
+import os
 import struct
 import soxr
+
 #import Jetson.GPIO as GPIO
 
 SHORT_NORMALIZE = (1.0/32768.0)
@@ -85,13 +85,14 @@ class ProcessAudio(Node):
             input_device_index=self.device
         )
 
-        # resampler for transform 44.1kHz to 16kHz 
-        self.resampler = soxr.ResampleStream(
-            RATE,              # input samplerate
-            16000,              # target samplerate
-            1,                  # channel(s)
-            dtype='int16'       # data type (default = 'float32')
-        )
+        # resampler for transform 44.1kHz to 16kHz
+        if self.rate != 16000:
+            self.resampler = soxr.ResampleStream(
+                RATE,              # input samplerate
+                16000,              # target samplerate
+                1,                  # channel(s)
+                dtype='int16'       # data type (default = 'float32')
+            )
 
         # for publish question of the user to ros
         self.pub_tts = self.create_publisher(String, "/user_input", 10)
@@ -191,10 +192,11 @@ class ProcessAudio(Node):
             # Convert audio data to numpy array for processing
             audio_np = np.frombuffer(self.data_audio, dtype=np.int16)
 
-            resempled_audio = self.resampler.resample_chunk(audio_np)
+            if self.rate != 16000:
+                audio_np = self.resampler.resample_chunk(audio_np)
             
             # Calculate prediction for wake word
-            prediction = self.model_wake_word.predict(resempled_audio)
+            prediction = self.model_wake_word.predict(audio_np)
             
             # Calculate current score for wake word
             scores = list(self.model_wake_word.prediction_buffer["jarvis"])
@@ -226,7 +228,8 @@ class ProcessAudio(Node):
 
     def destroy_node(self):
         """Clean up when node is destroyed"""
-        self.mic_stream.delete()
+        if self.mic_stream.is_active():
+            self.mic_stream.stop_stream()
         super().destroy_node()
 
 def main(args=None):
