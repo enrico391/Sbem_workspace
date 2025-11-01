@@ -32,8 +32,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'wakeword_stt = wakeword_stt_tts.wakeword_stt:main',
-            'tts_server = wakeword_stt_tts.tts_server:main',
+            'wakeword_stt.py = wakeword_stt_tts.wakeword_stt:main',
+            'tts_server.py = wakeword_stt_tts.tts_server:main',
         ],
     },
 )
