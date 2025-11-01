@@ -10,7 +10,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String, Bool
 from pydub import AudioSegment
-from send_toTTS import SenderTTS
+from senderTTS import SenderTTS
 import threading
 
 from rclpy.qos import qos_profile_sensor_data
@@ -19,25 +19,29 @@ from rclpy.qos import qos_profile_sensor_data
 
 class AudioPlayerNode(Node):
     """Node to play audio response from agent"""
-    def __init__(self, useLocalTTS= False, typeLocalTTS="coqui") -> None:
+    def __init__(self) -> None:
         super().__init__("tts_sbem")
 
+        # declare parameters for the node
+        self.declare_parameters("", [
+            ("channels", 1),
+            ("device", 24),
+            ("useLocalTTS", False),
+            ("typeLocalTTS", "coqui")
+        ])
+
+        self.useLocalTTS = self.get_parameter("useLocalTTS").get_parameter_value().bool_value
+        
         #check if use local TTS and initialize the class
-        self.useLocalTTS = useLocalTTS
         if(self.useLocalTTS):
-            self.requestTTS = SenderTTS(typeLocalTTS)
+            type_localTTS = self.get_parameter("typeLocalTTS").get_parameter_value().string_value
+            self.requestTTS = SenderTTS(type_localTTS)
         
         # variable for audio playback
         self.audio = pyaudio.PyAudio()
 
         # variable for interrupting the playback
         self.interrupt_playback = False
-
-        # declare parameters for the audio player
-        self.declare_parameters("", [
-            ("channels", 1),
-            ("device", -1),
-        ])
 
         # subscribe to the response from the agent
         self.sub = self.create_subscription(
@@ -64,6 +68,7 @@ class AudioPlayerNode(Node):
         """Function to play audio data"""
         
         try:
+            self.get_logger().info("Starting audio playback...")
             # Convert the audio data to an AudioSegment
             audio = AudioSegment.from_file(BytesIO(content), format=format)
             
@@ -78,10 +83,9 @@ class AudioPlayerNode(Node):
                 format=self.audio.get_format_from_width(sample_width),
                 channels=channels,
                 rate=frame_rate,
-                output=True
+                output=True,
+                output_device_index=self.get_parameter("device").get_parameter_value().integer_value
             )
-            
-            
             
             # Reset interrupt flag at start of playback
             self.interrupt_playback = False
@@ -131,6 +135,7 @@ class AudioPlayerNode(Node):
             else:
                 try:
                     # Create TTS object
+                    self.get_logger().info(f"Use gTTS to transform text to speech...")
                     tts = gTTS(text=msg.data, lang='it', slow=False)
                     
                     # Transform tts to right format
@@ -148,7 +153,6 @@ class AudioPlayerNode(Node):
                     
                 except Exception as e:
                     self.get_logger().error(f"Error in gTTS playback: {str(e)}")
-
 
 
 def main(args=None):
