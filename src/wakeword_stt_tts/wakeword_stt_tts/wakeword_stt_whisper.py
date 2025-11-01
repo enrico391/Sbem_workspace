@@ -23,7 +23,7 @@ import soxr
 
 SHORT_NORMALIZE = (1.0/32768.0)
 
-TIMEOUT_LENGTH = 3
+TIMEOUT_LENGTH = 2
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
@@ -39,7 +39,7 @@ class ProcessAudio(Node):
         super().__init__("processAudio")
         self.nodename = "processAudio"
         
-        self.model = WhisperModel("base", device="cpu", compute_type="int8")
+        self.model = WhisperModel("small", device="cpu", compute_type="int8")
         self.model_wake_word = Model(wakeword_models=["jarvis"],inference_framework="tflite")
 
         self.start_record = False
@@ -164,66 +164,19 @@ class ProcessAudio(Node):
         try:
             # Convert audio bytes to numpy array
             audio_np = np.frombuffer(audio_data, dtype=np.int16)
-            
-            segments, _ = self.model.transcribe(audio_np,language='en', beam_size=5)
+            audio_float = audio_np.astype(np.float32) / 32768.0
+
+            segments, _ = self.model.transcribe(audio_float,
+                                                language='it',
+                                                beam_size=5,
+                                                vad_filter=True,
+                                                vad_parameters=dict(min_silence_duration_ms=1000))
             
             # Publish to ROS topic
             for segment in segments:
                 transcript = segment.text
                 self.get_logger().info(f"Transcribed Text: {transcript}")
-            # Check if we have enough audio data
-            # if len(audio_np) < 1000:  # Minimum required length
-            #     self.get_logger().warning("Audio recording too short, ignoring")
-            #     return False
-                
-            # # Audio needs to be normalized to float32 in range [-1, 1]
-            # audio_float = audio_np.astype(np.float32) / 32768.0
             
-            # self.get_logger().info("Transcribing audio...")
-            
-            # # Transcribe with websocket server
-            # data = pickle.dumps(audio_float)
-            # # Send length of data first
-            # self.sock.sendall(len(data).to_bytes(4, byteorder='big'))
-            # self.sock.sendall(data)
-            # self.get_logger().info("Sent audio_float to server.")
-            
-            #segments, _ = self.model.transcribe(audio_float, beam_size=5)
-            
-            # --- Receive response from server ---
-            # First, receive the length of the response (4 bytes)
-            # response_len_bytes = self.sock.recv(4)
-            # if len(response_len_bytes) < 4:
-            #     self.get_logger().error("Failed to receive response length from server.")
-            #     return False
-            # response_len = int.from_bytes(response_len_bytes, byteorder='big')
-
-            # # Now receive the actual response data
-            # response_data = b''
-            # while len(response_data) < response_len:
-            #     packet = self.sock.recv(response_len - len(response_data))
-            #     if not packet:
-            #         break
-            #     response_data += packet
-
-            # if len(response_data) != response_len:
-            #     self.get_logger().error("Incomplete response received from server.")
-            #     return False
-
-            # # Unpickle the response (assuming it's a string or object)
-            # transcribed_text = pickle.loads(response_data)
-            # self.get_logger().info(f"Received transcription: {transcribed_text}")
-
-            
-            # if transcribed_text.strip():
-            #     # Publish transcript
-            #     msg_text = String()
-            #     msg_text.data = transcribed_text.strip()
-            #     self.pub_tts.publish(msg_text)
-            #     return True
-            # else:
-            #     self.get_logger().warning("No transcription produced")
-            #     return False
         
         except Exception as e:
             self.get_logger().error(f"Error transcribing: {str(e)}")
@@ -231,7 +184,6 @@ class ProcessAudio(Node):
 
     def process_audio(self):
         """Process audio data from the microphone"""
-        
         try:
             self.get_logger().debug("Listening for wake word...")
             self.data_audio = self.mic_stream.read(CHUNK, exception_on_overflow=False)
