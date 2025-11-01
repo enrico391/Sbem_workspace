@@ -43,7 +43,7 @@ This section explains how to start all required packages for simple navigation u
 
   - *(for simulated robot)*
     ```sh
-    ros2 launch robot_sbem launch_sim.launch.py # start gazebo simulation, robot description and sensors
+    ros2 launch robot_sbem sbem_sim_total.launch.py # start gazebo simulation, robot description and sensors
     ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
     ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
     ```

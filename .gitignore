@@ -1,0 +1,8 @@
+.envsbem/*
+build/
+devel/
+install/
+log/
+.vscode/
+*.pyc
+Sbem.code-workspace
