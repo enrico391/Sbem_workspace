@@ -84,10 +84,14 @@ def generate_launch_description():
     #    output='screen',
     #)
 
-    audio_listener_node = Node(
-        package='sbem_speaking',
-        executable='wake_stt_sbem_direct_mic.py',
-        output='screen',
+    audio_listener_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                FindPackageShare('wakeword_stt_tts').find('wakeword_stt_tts'),
+                'launch',
+                'wakeword_stt_on_device.launch.py'
+            )
+        ])
     )
 
 
