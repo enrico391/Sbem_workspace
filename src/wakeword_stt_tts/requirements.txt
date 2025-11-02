@@ -1,0 +1,9 @@
+pvporcupine
+pvcheetah
+pvrecorder
+pyaudio
+soxr
+faster-whisper
+openwakeword
+gTTS
+numpy<1.25.0
