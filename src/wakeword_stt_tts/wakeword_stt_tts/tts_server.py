@@ -25,7 +25,7 @@ class AudioPlayerNode(Node):
         # declare parameters for the node
         self.declare_parameters("", [
             ("channels", 1),
-            ("device", 24),
+            ("device", 25),
             ("useLocalTTS", False),
             ("typeLocalTTS", "coqui")
         ])

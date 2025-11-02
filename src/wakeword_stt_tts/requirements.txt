@@ -7,3 +7,4 @@ faster-whisper
 openwakeword
 gTTS
 numpy<1.25.0
+pydub
