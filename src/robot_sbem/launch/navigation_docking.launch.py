@@ -39,7 +39,7 @@ def generate_launch_description():
     container_name_full = (namespace, '/', container_name)
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
-    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('sbem_docking'),'params', 'nova_carter_docking.yaml'))
+    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('robot_sbem'),'config', 'nova_carter_docking.yaml'))
 
     lifecycle_nodes = ['controller_server',
                        'smoother_server',

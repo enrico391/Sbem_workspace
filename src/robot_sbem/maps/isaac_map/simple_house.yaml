@@ -1,0 +1,6 @@
+image: SBEM_sim_working.png
+resolution: 0.05
+origin: [-5.025000190734863, -4.824999904632568, 0.0000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

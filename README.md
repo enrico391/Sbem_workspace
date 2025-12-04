@@ -27,7 +27,7 @@ The idea behind this robot is to use it for helping people in houses and use it 
 # Simple Navigation Guide
 This section explains how to start all required packages for simple navigation using the **Nav2** stack in the real world or simulation.
 
-### Steps to Start Navigation
+### Steps to Start Navigation with Isaac Sim:
 1. Navigate to the project workspace:
 
    ```sh
@@ -35,35 +35,20 @@ This section explains how to start all required packages for simple navigation u
    source install/setup.bash
    ```
 
-2. Start essential nodes
-  - *(for real robot)*:
+2. Start nodes and isaac sim:
+  - Start isaac sim
+
+  - Start rviz, localization and navigation nodes:
     ```sh
-    ros2 launch robot_sbem sbem_real_total.launch.py 
+    ros2 launch robot_sbem sbem_isaac_sim.launch.py # start rviz, joystick, teleop
+    ros2 launch robot_sbem localization.launch.py  # start localization and nav2
+    ros2 launch robot_sbem navigation_docking.launch.py use_sim_time:=true # start navigation and docking system
     ```
 
-  - *(for simulated robot)*
-    ```sh
-    ros2 launch robot_sbem sbem_sim_total.launch.py # start gazebo simulation, robot description and sensors
-    ros2 launch robot_sbem footprint_filter_laser.launch.py  # Filter robot shape in laser scan
-    ros2 launch robot_sbem joystick.launch.py  # Enable joystick control if needed
-    ```
-
-# Docking System
-### Start Docking server by nav2 for Auto-Docking:
-```sh
-ros2 launch robot_sbem docking_sbem.launch.py # for real environment
-ros2 launch robot_sbem docking_sbem.launch.py  params_file_dock:='/home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/config/docking_simulation.yaml' use_sim_time:=true # for simulation
-
-```
 
 ### Start Apriltag detection:
 ```sh
 ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/image -r camera_info:=/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
-```
-
-*(For Gazebo simulation, use:)*
-```sh
-ros2 run apriltag_ros apriltag_node -ros-args -r image_rect:=/camera/image_raw -r camera_info:=/camera/camera_info --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
 ```
 
 ### Command to send message to docking server: *(change coordinates)*
@@ -89,16 +74,5 @@ ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
 ```sh
 ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
 ```
-
-
-# SBEM AI
-A folder named **sbem_AI** contains all scripts required for interaction with SBEM's LLM-based system. The AI uses **LangChain** and **LangGraph** to create an agent that utilizes tools for controlling the robot's position using voice commands. I tried with last gemini model Gemini 2.0 Flash and local model qwen2.5:14b with ollama
-
-### Procedure:
-1. **Start a TTS server** using Piper or CoquiTTS for now.
-2. **Run the AI agent:**
-   ```sh
-   python3 agent_sbem.py
-   ```
 
 

@@ -39,7 +39,7 @@ docking_server:
     home_dock:
       type: 'nova_carter_dock'
       frame: map
-      pose: [-0.6, 10.0, 0.15]
+      pose: [-4.01, -1.07, 0.03]
 
     controller:
       k_phi: 3.0
