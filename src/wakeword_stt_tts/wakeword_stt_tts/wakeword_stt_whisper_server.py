@@ -45,16 +45,16 @@ class ProcessAudio(Node):
         self.frames = []
         self.end = 0
 
-        # List all available audio input devices
-        # self.get_logger().info("Available audio input devices:")
-        # for i in range(self.audio.get_device_count()):
-        #     info = self.audio.get_device_info_by_index(i)
-        #     self.get_logger().info(f"Device {i}: {info['name']} (Input Channels: {info['maxInputChannels']})")
+        #List all available audio input devices
+        self.get_logger().info("Available audio input devices:")
+        for i in range(self.audio.get_device_count()):
+            info = self.audio.get_device_info_by_index(i)
+            self.get_logger().info(f"Device {i}: {info['name']} (Input Channels: {info['maxInputChannels']})")
 
         self.declare_parameters("", [
             ("channels", CHANNELS),
             ("rate", RATE),
-            ("device", 0),
+            ("device", 25),
             ("format", FORMAT),
             ("on_device", False)
         ])
