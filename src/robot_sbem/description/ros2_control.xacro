@@ -62,11 +62,11 @@
         </ros2_control>
     </xacro:if>
 
-    <gazebo>
+    <!-- <gazebo>
         <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
             <parameters>$(find robot_sbem)/config/my_controllers.yaml</parameters>
             <parameters>$(find robot_sbem)/config/gaz_ros2_ctl_use_sim.yaml</parameters>
         </plugin>
-    </gazebo>
+    </gazebo> -->
 
 </robot>

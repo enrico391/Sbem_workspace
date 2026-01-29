@@ -19,9 +19,9 @@
   <depend>tf2_ros</depend>
   <depend>robot_state_publisher</depend>
   <depend>rviz2</depend>
-  <depend>rosbridge_server</depend>
-  <depend>image_transport</depend>
-  <depend>apriltag_ros</depend>
+  <!-- <depend>rosbridge_server</depend> -->
+  <!-- <depend>image_transport</depend> -->
+  <!-- <depend>apriltag_ros</depend> -->
   <depend>laser_filters</depend>
 
 
