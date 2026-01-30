@@ -30,7 +30,7 @@ amcl:
     save_pose_rate: 0.5
     sigma_hit: 0.2
     tf_broadcast: true
-    transform_tolerance: 1.0
+    transform_tolerance: 2.0
     update_min_a: 0.05
     update_min_d: 0.05
     z_hit: 0.5
@@ -289,8 +289,8 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 5.0
-      publish_frequency: 5.0
+      update_frequency: 3.0
+      publish_frequency: 3.0
       global_frame: odom
       robot_base_frame: base_link
       use_sim_time: False
@@ -299,13 +299,14 @@ local_costmap:
       height: 3
       resolution: 0.05
       robot_radius: 0.24 #0.225
+      footprint: "[[0.24, 0.0], [0.17, 0.17], [0.0, 0.24], [-0.17, 0.17], [-0.24, 0.0], [-0.17, -0.17], [0.0, -0.24], [0.17, -0.17]]"
       plugins: ["obstacle_layer", "inflation_layer","denoise_layer"]
       
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         cost_scaling_factor: 2.58 # change for wall crash 3.0
-        inflation_radius: 0.24 # change for wall crash 
+        inflation_radius: 0.26 # change for wall crash 
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -351,12 +352,13 @@ local_costmap:
 global_costmap:
   global_costmap:
     ros__parameters:
-      update_frequency: 5.0
-      publish_frequency: 5.0
+      update_frequency: 1.0
+      publish_frequency: 1.0
       global_frame: map
       robot_base_frame: base_link
       use_sim_time: False
-      robot_radius: 0.22 # default 0.20 
+      robot_radius: 0.24 # default 0.20 
+      footprint: "[[0.24, 0.0], [0.17, 0.17], [0.0, 0.24], [-0.17, 0.17], [-0.24, 0.0], [-0.17, -0.17], [0.0, -0.24], [0.17, -0.17]]"
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -401,7 +403,7 @@ map_saver:
 
 planner_server:
   ros__parameters:
-    expected_planner_frequency: 20.0
+    expected_planner_frequency: 1.0
     use_sim_time: False
     planner_plugins: ["GridBased"]
     GridBased:
@@ -463,7 +465,7 @@ waypoint_follower:
 velocity_smoother:
   ros__parameters:
     use_sim_time: False
-    smoothing_frequency: 20.0
+    smoothing_frequency: 3.0
     scale_velocities: False
     feedback: "OPEN_LOOP" # change to "CLOSED_LOOP" with kalman filter
     max_velocity: [0.15, 0.15, 1.0]
