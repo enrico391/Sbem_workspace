@@ -17,6 +17,44 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(angles REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(opennav_docking_core REQUIRED)
+find_package(isaac_ros_apriltag_interfaces REQUIRED)
+
+
+set(dependencies
+  angles
+  rclcpp
+  rclcpp_action
+  rclcpp_lifecycle
+  rclcpp_components
+  std_msgs
+  sensor_msgs
+  nav2_msgs
+  nav_msgs
+  geometry_msgs
+  tf2_ros
+  tf2_geometry_msgs
+  pluginlib
+  opennav_docking_core
+  isaac_ros_apriltag_interfaces
+)
+
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -31,6 +69,15 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+
+add_executable(dock_pose_publisher src/dock_pose_publisher.cpp)
+ament_target_dependencies(dock_pose_publisher ${dependencies})
+
+install(TARGETS
+  dock_pose_publisher
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(
   DIRECTORY config description launch worlds maps meshes
@@ -54,6 +101,7 @@ install(PROGRAMS
 )
 
 
-
+ament_export_include_directories(include)
+ament_export_dependencies(${dependencies})
 
 ament_package()
