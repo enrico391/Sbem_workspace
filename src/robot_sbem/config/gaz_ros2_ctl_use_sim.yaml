@@ -1,3 +1,0 @@
-gaz_ros2_ctl_use_sim:
-  ros__parameters:
-    use_sim_time: true
