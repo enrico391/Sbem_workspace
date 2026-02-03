@@ -126,6 +126,16 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 {
   comms_.read_values(wheel_l_.turns, wheel_r_.turns, battery_.voltage, battery_.current);
 
+
+  // Debug: Log raw encoder values
+  static int debug_counter = 0;
+  if (debug_counter++ % 10 == 0) {
+    RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), 
+      "RAW: L_turns=%.4f, R_turns=%.4f | L_pos=%.4f, R_pos=%.4f",
+      wheel_l_.turns, wheel_r_.turns, wheel_l_.pos, wheel_r_.pos);
+  }
+
+
   double delta_seconds = period.seconds();
 
   double pos_prev = wheel_l_.pos;
