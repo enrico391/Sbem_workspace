@@ -1,0 +1,67 @@
+# Copyright (c) 2024, NVIDIA CORPORATION.  All rights reserved.
+#
+# Custom Dockerfile for MPU6050 sensor support
+# Uses apt repository installation instead of building from source
+
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+# Switch to root to perform installations
+USER root
+
+# Install dependencies for RPLIDAR and Navigation2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-rplidar-ros \
+    ros-humble-laser-filters \
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    ros-humble-ros2-control \
+    ros-humble-ros2-controllers \
+    ros-humble-twist-stamper \
+    ros-humble-opennav-docking \
+    libserial-dev
+    #&& rm -rf /var/lib/apt/lists/*
+
+
+
+# Install dependencies for MPU6050
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libi2c-dev \
+    libi2c0
+    #&& rm -rf /var/lib/apt/lists/*
+
+
+# Add the Intel RealSense repository and key
+RUN mkdir -p /etc/apt/keyrings
+
+RUN curl -sSf https://librealsense.realsenseai.com/Debian/librealsenseai.asc | \
+    gpg --dearmor | tee /etc/apt/keyrings/librealsenseai.gpg > /dev/null
+
+RUN echo "deb [signed-by=/etc/apt/keyrings/librealsenseai.gpg] https://librealsense.realsenseai.com/Debian/apt-repo `lsb_release -cs` main" | \
+    tee /etc/apt/sources.list.d/librealsense.list
+
+# Install librealsense SDK from Intel repository (essential for D415)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-librealsense2* \
+    ros-humble-realsense2-*
+    #&& rm -rf /var/lib/apt/lists/* # commented to avoid the elimination of header used after
+
+
+
+
+# install dependencies for isaac_ros_apriltag
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-isaac-ros-apriltag-interfaces \
+    ros-humble-isaac-ros-common \
+    ros-humble-isaac-ros-managed-nitros \
+    ros-humble-isaac-ros-nitros \
+    ros-humble-isaac-ros-nitros-image-type \
+    ros-humble-isaac-ros-image-proc \
+    ros-humble-isaac-ros-test
+    #&& rm -rf /var/lib/apt/lists/* # commented to avoid the elimination of header used after
+# Switch back to the 'admin' user (standard for Isaac ROS)
+#USER admin
+
+# Set ROS Domain ID
+ENV ROS_DOMAIN_ID=2
