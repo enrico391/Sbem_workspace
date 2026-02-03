@@ -61,6 +61,13 @@ def generate_launch_description():
             parameters=[{'use_first_detection': True, 'dock_tag_id': 0}],
     )
 
+    apriltag_detector_realsense_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            get_package_share_directory('isaac_ros_apriltag'), 
+            'launch', 
+            'isaac_ros_apriltag_realsense.launch.py'))
+    )
+
     # ros_bridge_server = Node(
     #     package='rosbridge_server',
     #     executable='rosbridge_websocket',
@@ -80,10 +87,11 @@ def generate_launch_description():
         declare_use_sim_time_cmd,
         declare_use_composition_cmd,
         declare_container_name_cmd,
+        apriltag_detector_realsense_node,
         dock_pose_publisher,
         localization_node,
         navigation_node,
-        docking_node
+        docking_node,
         # ros_bridge_server,
         # server_stt,
     ])
