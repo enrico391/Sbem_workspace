@@ -21,14 +21,14 @@ def generate_launch_description():
             'params_file_dock',
             default_value=os.path.join(
                  get_package_share_directory(
-                     'robot_sbem'),
-                 'config', 'nova_carter_docking.yaml'
+                     'sbem_docking'),
+                 'params', 'nova_carter_docking.yaml'
              ),
             description='Full path to the docking param file to load'),
     ]
     
     use_sim_time = LaunchConfiguration('use_sim_time', default='False')
-    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('robot_sbem'),'config', 'nova_carter_docking.yaml'))
+    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('sbem_docking'),'params', 'nova_carter_docking.yaml'))
     
     docking_server = Node(
         package='opennav_docking',
