@@ -37,7 +37,7 @@ def generate_launch_description():
             os.path.join(
                 FindPackageShare('robot_sbem').find('robot_sbem'),
                 'launch',
-                'footprint_filter_laser.launch.py'
+                'footprint_filter_laser_sim.launch.py'
             )
         ])
     )
