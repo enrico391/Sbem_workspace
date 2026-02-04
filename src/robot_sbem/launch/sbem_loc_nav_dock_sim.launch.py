@@ -71,19 +71,19 @@ def generate_launch_description():
             parameters=[{'use_first_detection': True, 'dock_tag_id': 0}],
     )
 
-    # apriltag_detector_realsense_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(os.path.join(
-    #         get_package_share_directory('isaac_ros_apriltag'), 
-    #         'launch', 
-    #         'isaac_ros_apriltag_realsense.launch.py'))
-    # )
+    apriltag_detector_realsense_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            get_package_share_directory('isaac_ros_apriltag'), 
+            'launch', 
+            'isaac_ros_apriltag_isaac_sim_pipeline.launch.py'))
+    )
     
     # Launch!
     return LaunchDescription([
         declare_use_sim_time_cmd,
         declare_use_composition_cmd,
         declare_container_name_cmd,
-        #apriltag_detector_realsense_node,
+        apriltag_detector_realsense_node,
         dock_pose_publisher,
         lidar_filter,
         localization_node,
