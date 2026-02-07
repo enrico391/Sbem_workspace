@@ -80,7 +80,7 @@ install(TARGETS
 )
 
 install(
-  DIRECTORY config description launch maps meshes
+  DIRECTORY config launch maps
   DESTINATION share/${PROJECT_NAME}
 )
 

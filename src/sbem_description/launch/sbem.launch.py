@@ -17,7 +17,7 @@ def generate_launch_description():
     use_ros2_control = LaunchConfiguration('use_ros2_control')
 
     # Process the URDF file
-    pkg_path = os.path.join(get_package_share_directory('robot_sbem'))
+    pkg_path = os.path.join(get_package_share_directory('sbem_description'))
     xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro') #xacro_file = os.path.join(pkg_path,'description','robot_sbem.urdf.xacro')
     robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time])
     

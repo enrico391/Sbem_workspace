@@ -66,7 +66,7 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("robot_sbem"), "description", "robot_sbem.urdf.xacro"]
+                [FindPackageShare("sbem_description"), "description", "robot_sbem.urdf.xacro"]
             ),
             " ",
             "use_mock_hardware:=",
