@@ -10,10 +10,10 @@
     esdf_slice_bounds_visualization_attachment_frame_id: "camera0_link"
 
     static_mapper:
-      esdf_slice_height: 0.0
-      # Expected to be tuned by users. Slice height depends on realsense mounting.
-      esdf_slice_min_height: -0.1
-      esdf_slice_max_height: 0.3
+      esdf_slice_height: 0.09
+      
+      esdf_slice_min_height: 0.09
+      esdf_slice_max_height: 0.65
 
     dynamic_mapper:
       esdf_slice_height: 0.0

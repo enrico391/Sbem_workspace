@@ -104,20 +104,20 @@ def add_nvblox(args: lu.ArgumentContainer) -> List[Action]:
     if camera == NvbloxCamera.realsense:
         assert args.num_cameras == 1, 'NvbloxCamera.realsense shall only be set for num_cameras==1'
 
-    base_config = lu.get_path('nvblox_examples_bringup', 'config/nvblox/nvblox_base.yaml')
-    segmentation_config = lu.get_path('nvblox_examples_bringup',
+    base_config = lu.get_path('sbem_nvblox_bringup', 'config/nvblox/nvblox_base.yaml')
+    segmentation_config = lu.get_path('sbem_nvblox_bringup',
                                       'config/nvblox/specializations/nvblox_segmentation.yaml')
-    detection_config = lu.get_path('nvblox_examples_bringup',
+    detection_config = lu.get_path('sbem_nvblox_bringup',
                                    'config/nvblox/specializations/nvblox_detection.yaml')
-    dynamics_config = lu.get_path('nvblox_examples_bringup',
+    dynamics_config = lu.get_path('sbem_nvblox_bringup',
                                   'config/nvblox/specializations/nvblox_dynamics.yaml')
-    isaac_sim_config = lu.get_path('nvblox_examples_bringup',
+    isaac_sim_config = lu.get_path('sbem_nvblox_bringup',
                                    'config/nvblox/specializations/nvblox_sim.yaml')
-    realsense_config = lu.get_path('nvblox_examples_bringup',
+    realsense_config = lu.get_path('sbem_nvblox_bringup',
                                    'config/nvblox/specializations/nvblox_realsense.yaml')
     multi_realsense_config = lu.get_path(
-        'nvblox_examples_bringup', 'config/nvblox/specializations/nvblox_multi_realsense.yaml')
-    zed_config = lu.get_path('nvblox_examples_bringup',
+        'sbem_nvblox_bringup', 'config/nvblox/specializations/nvblox_multi_realsense.yaml')
+    zed_config = lu.get_path('sbem_nvblox_bringup',
                              'config/nvblox/specializations/nvblox_zed.yaml')
 
     if mode is NvbloxMode.static:

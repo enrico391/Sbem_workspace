@@ -23,8 +23,8 @@ import isaac_ros_launch_utils as lu
 from nvblox_ros_python_utils.nvblox_constants import NVBLOX_CONTAINER_NAME
 
 
-EMITTER_FLASHING_CONFIG_FILE_PATH = lu.get_path('nvblox_examples_bringup', 'config/sensors/realsense_emitter_flashing.yaml')
-EMITTER_ON_CONFIG_FILE_PATH = lu.get_path('nvblox_examples_bringup', 'config/sensors/realsense_emitter_on.yaml')
+EMITTER_FLASHING_CONFIG_FILE_PATH = lu.get_path('sbem_nvblox_bringup', 'config/sensors/realsense_emitter_flashing.yaml')
+EMITTER_ON_CONFIG_FILE_PATH = lu.get_path('sbem_nvblox_bringup', 'config/sensors/realsense_emitter_on.yaml')
 
 # By default our behaviour is:
 # - Run the splitter on camera0,
