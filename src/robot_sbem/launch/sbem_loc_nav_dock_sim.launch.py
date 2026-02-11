@@ -83,7 +83,7 @@ def generate_launch_description():
         declare_use_sim_time_cmd,
         declare_use_composition_cmd,
         declare_container_name_cmd,
-        apriltag_detector_realsense_node,
+        #apriltag_detector_realsense_node,
         dock_pose_publisher,
         lidar_filter,
         localization_node,
