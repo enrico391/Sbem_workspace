@@ -1,334 +1,357 @@
 <?xml version="1.0" ?>
-<robot name="robot_sbem" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="URDF_SBEM_BASE" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:include filename="materials.xacro" />
-<xacro:include filename="inertial_macros.xacro" />
-
-
-
-
-
-<!-- BASE LINK -->
+<xacro:include filename="$(find sbem_description)/description/materials.xacro" />
 
 <link name="base_link">
+  <inertial>
+    <origin xyz="0.013593795340662495 -2.6795766040815576e-05 0.012372687673449411" rpy="0 0 0"/>
+    <mass value="3.27532171522102"/>
+    <inertia ixx="0.028962" iyy="0.039289" izz="0.047296" ixy="-7e-06" iyz="-1e-06" ixz="-0.002355"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
 </link>
 
+<link name="cover_frame_1">
+  <inertial>
+    <origin xyz="0.009301831240150795 0.020092107452140576 -0.07145599973646566" rpy="0 0 0"/>
+    <mass value="2.7972403846371616"/>
+    <inertia ixx="0.082365" iyy="0.082708" izz="0.112881" ixy="-6e-06" iyz="-0.000349" ixz="0.000984"/>
+  </inertial>
+  <visual>
+    <origin xyz="8.6e-05 0.019119 -0.17" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="8.6e-05 0.019119 -0.17" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
 
-<!-- BASE FOOTPRINT LINK -->
-<joint name="base_footprint_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="base_footprint"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+<link name="wheel_right_1">
+  <inertial>
+    <origin xyz="-4.1078592539778305e-06 -0.038546590185321694 -3.4548038702541736e-07" rpy="0 0 0"/>
+    <mass value="1.7164767445811084"/>
+    <inertia ixx="0.003266" iyy="0.005649" izz="0.003266" ixy="1e-06" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.0 0.131 0.003" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/wheel_right_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.0 0.131 0.003" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/wheel_right_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="wheel_left_1">
+  <inertial>
+    <origin xyz="-4.10785925623991e-06 0.038546590185311785 3.454803947484063e-07" rpy="0 0 0"/>
+    <mass value="1.7164767445796552"/>
+    <inertia ixx="0.003266" iyy="0.005649" izz="0.003266" ixy="-1e-06" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0 -0.13 0.003" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/wheel_left_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.0 -0.13 0.003" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/wheel_left_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="camera_1">
+  <inertial>
+    <origin xyz="0.0007560381482770717 -6.180165086932434e-05 0.0001511023550000573" rpy="0 0 0"/>
+    <mass value="0.005959780420639502"/>
+    <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.235119 8.6e-05 -0.0505" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.235119 8.6e-05 -0.0505" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/camera_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="support_castor_front_2">
+  <inertial>
+    <origin xyz="-0.014328459289254525 1.8257642032892817e-07 -0.008560908428929016" rpy="0 0 0"/>
+    <mass value="0.006272505040133622"/>
+    <inertia ixx="1e-06" iyy="2e-06" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.148231 0.0 0.036123" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/support_castor_front_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.148231 0.0 0.036123" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/support_castor_front_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="castor_wheel_front_1">
+  <inertial>
+    <origin xyz="3.541784645288981e-07 0.010133948703052667 2.1457855046980168e-07" rpy="0 0 0"/>
+    <mass value="0.012935651363424177"/>
+    <inertia ixx="2e-06" iyy="4e-06" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.129258 0.009866 0.0661" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/castor_wheel_front_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.129258 0.009866 0.0661" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/castor_wheel_front_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="support_castor_back_1">
+  <inertial>
+    <origin xyz="-0.014328774710402836 -3.932261495924688e-08 -0.008560908428929745" rpy="0 0 0"/>
+    <mass value="0.006272505040133622"/>
+    <inertia ixx="1e-06" iyy="2e-06" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.154231 -7.6e-05 0.036123" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/support_castor_back_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.154231 -7.6e-05 0.036123" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/support_castor_back_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="castor_wheel_back_1">
+  <inertial>
+    <origin xyz="3.875731618974143e-08 0.010133726804017166 2.145785498730568e-07" rpy="0 0 0"/>
+    <mass value="0.012935651363424177"/>
+    <inertia ixx="2e-06" iyy="4e-06" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.173204 0.00979 0.0661" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/castor_wheel_back_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.173204 0.00979 0.0661" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/castor_wheel_back_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="laser_frame">
+  <inertial>
+    <origin xyz="-4.802109999924031e-07 3.2614800062540994e-07 0.008500000000000146" rpy="0 0 0"/>
+    <mass value="0.08598231018949315"/>
+    <inertia ixx="2.6e-05" iyy="2.6e-05" izz="4.9e-05" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.176783 0.000173 -0.1882" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/laser_frame_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.176783 0.000173 -0.1882" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/laser_frame_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="imu_1">
+  <inertial>
+    <origin xyz="-0.000500389353186954 -8.222275792329365e-11 0.002499999999999905" rpy="0 0 0"/>
+    <mass value="0.0003900000001178686"/>
+    <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="-0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.015326 0.0 -0.03" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/imu_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.015326 0.0 -0.03" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/imu_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="case_realsensed415_1">
+  <inertial>
+    <origin xyz="0.18735134281404422 0.009804464840611201 0.01353151407032474" rpy="0 0 0"/>
+    <mass value="0.01393318755472633"/>
+    <inertia ixx="1.8e-05" iyy="3e-06" izz="1.8e-05" ixy="1e-06" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.014119 8.6e-05 -0.228" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/case_realsensed415_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.014119 8.6e-05 -0.228" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/case_realsensed415_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="camera0_link">
+  <inertial>
+    <origin xyz="0.009980749747240614 -0.007970490230886512 -0.0002735366586204546" rpy="0 0 0"/>
+    <mass value="0.1125947025550983"/>
+    <inertia ixx="8.7e-05" iyy="8e-06" izz="8.6e-05" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.195119 -0.007879 -0.241995" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/realsenseD415_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.195119 -0.007879 -0.241995" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://sbem_description/meshes/realsenseD415_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="joint_base" type="fixed">
+  <origin xyz="-8.6e-05 -0.019119 0.17" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="cover_frame_1"/>
 </joint>
 
-<link name="base_footprint">
-</link>
-
-
-<!-- BODY LINK -->
-
-<joint name="chassis_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="chassis"/>
-    <origin xyz="-0.1 0 0"/>
+<joint name="right_wheel_joint" type="continuous">
+  <origin xyz="0.0 -0.131 -0.003" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="wheel_right_1"/>
+  <axis xyz="-0.0 1.0 -0.0"/>
 </joint>
-
-<link name="chassis">
-    <visual>
-        <origin xyz="0.01 -0.04 -0.075"/>
-        <geometry>
-            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>
-        </geometry>
-        <material name="white"/> 
-    </visual>
-    <collision>
-        <origin xyz="0.10 -0.04 -0.075"/>
-        <geometry> 
-            <mesh filename="file://$(find robot_sbem)/meshes/cover_frame_1.stl" scale="0.001 0.001 0.001"/>  
-        </geometry> 
-    </collision>
-    <inertial>
-        <origin xyz="0.01 -0.04 -0.075" rpy="0 0 0"/>
-        <mass value="0.476900692892485"/>
-        <inertia ixx="1.283383" iyy="1.267627" izz="1.750151" ixy="-0.000192" iyz="-0.005412" ixz="0.001357"/>
-      </inertial>
-
-</link>
-
-
-<gazebo reference="chassis">
-    <material>Gazebo/White</material>
-</gazebo>
-
-
-
-<link name="internal_body">
-    <inertial>
-      <origin xyz="-0.1 -0.04 -0.078" rpy="0 0 0"/>
-      <mass value="0.54535521653018"/>
-      <inertia ixx="0.220166" iyy="0.326028" izz="0.379994" ixy="-5.3e-05" iyz="-5e-06" ixz="-0.018753"/>
-    </inertial>
-    <visual>
-        <origin xyz="-0.1 -0.04 -0.078"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="white"/>
-    </visual>
-    <collision>
-        <origin xyz="-0.1 -0.04 -0.078"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-
-  <joint name="internal_body_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="internal_body"/>
-  </joint>
-
-  <gazebo reference="internal_body">
-        <material>Gazebo/Blue</material>
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-    </gazebo>
-
-
-<!-- LEFT WHEEL LINK -->
 
 <joint name="left_wheel_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="left_wheel"/>
-    <origin xyz="-0.075 0.175 0" rpy="0 ${pi/2} 0" />
-    <axis xyz="0 1 0"/>
+  <origin xyz="0.0 0.13 -0.003" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="wheel_left_1"/>
+  <axis xyz="-0.0 1.0 -0.0"/>
 </joint>
 
-<link name="left_wheel">
-    <visual>
-        <geometry>
-            <cylinder radius="0.08" length="0.04"/>
-        </geometry>
-        <material name="blue"/>
-    </visual>
-    <collision>
-        <geometry>
-          <cylinder radius="0.08" length="0.04"/>
-        </geometry>
-    </collision>
-    <xacro:inertial_cylinder mass="1" length="0.04" radius="0.08">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </xacro:inertial_cylinder>
-</link>
-
-<gazebo reference="left_wheel">
-    <material>Gazebo/Blue</material>
-</gazebo>
-
-<!-- RIGHT WHEEL LINK -->
-<joint name="right_wheel_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="right_wheel"/>
-    <origin xyz="-0.075 -0.175 0" rpy="0 ${pi/2} 0" />
-    <axis xyz="0 1 0"/>
+<joint name="joint_low_camera" type="fixed">
+  <origin xyz="0.235205 0.019033 -0.1195" rpy="0 0 0"/>
+  <parent link="cover_frame_1"/>
+  <child link="camera_1"/>
 </joint>
 
-<link name="right_wheel">
-    <visual>
-        <geometry>
-          <cylinder radius="0.08" length="0.04"/>
-        </geometry>
-        <material name="blue"/>
-    </visual>
-    <collision>
-        <geometry>
-          <cylinder radius="0.08" length="0.04"/>
-        </geometry>
-    </collision>
-    <xacro:inertial_cylinder mass="1" length="0.04" radius="0.08">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </xacro:inertial_cylinder>
-</link>
-
-<gazebo reference="right_wheel">
-    <material>Gazebo/Blue</material>
-</gazebo>
-
-<!-- CASTER WHEEL LINK -->
-
-<joint name="caster_wheel_joint_1" type="fixed">
-    <parent link="chassis"/>
-    <child link="caster_wheel_1"/>
-    <origin xyz="0.14 0 -0.030"/>
+<joint name="joint_castor_wheel_front" type="continuous">
+  <origin xyz="0.148231 0.0 -0.036123" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="support_castor_front_2"/>
+  <axis xyz="0.0 -0.0 -1.0"/>
 </joint>
 
-
-<link name="caster_wheel_1">
-    <visual>
-        <geometry>
-            <sphere radius="0.05"/>
-        </geometry>
-        <material name="black"/>
-    </visual>
-    <collision>
-        <geometry>
-            <sphere radius="0.05"/>
-        </geometry>
-    </collision>
-    <xacro:inertial_sphere mass="0.1" radius="0.05">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </xacro:inertial_sphere>
-</link>
-
-<gazebo reference="caster_wheel_1">
-    <material>Gazebo/White</material>
-    <mu1 value="0.001"/>
-    <mu2 value="0.001"/>
-</gazebo>
-
-
-
-
-<joint name="caster_wheel_joint_2" type="fixed">
-    <parent link="chassis"/>
-    <child link="caster_wheel_2"/>
-    <origin xyz="-0.1 0 -0.030"/>
+<joint name="joint_castor_wheel_front_2" type="continuous">
+  <origin xyz="-0.018973 -0.009866 -0.029977" rpy="0 0 0"/>
+  <parent link="support_castor_front_2"/>
+  <child link="castor_wheel_front_1"/>
+  <axis xyz="-0.0 1.0 -0.0"/>
 </joint>
 
-<link name="caster_wheel_2">
-    <visual>
-        <geometry>
-            <sphere radius="0.05"/>
-        </geometry>
-        <material name="black"/>
-    </visual>
-    <collision>
-        <geometry>
-            <sphere radius="0.05"/>
-        </geometry>
-    </collision>
-    <xacro:inertial_sphere mass="0.1" radius="0.08">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </xacro:inertial_sphere>
-</link>
-
-<gazebo reference="caster_wheel_2">
-    <material>Gazebo/White</material>
-    <mu1 value="0.001"/>
-    <mu2 value="0.001"/>
-</gazebo>
-
-
-
-<link name="central_body">
-    <inertial>
-      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
-      <mass value="0.460328263120194"/>
-      <inertia ixx="0.905366" iyy="0.541365" izz="0.75836" ixy="-5.7e-05" iyz="-0.000152" ixz="0.05854"/>
-    </inertial>
-    <visual>
-      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/central_body_1.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <!-- <geometry>
-        <cylinder radius="0.216" length="0.342"/>
-      </geometry> -->
-      <material name="white"/>
-    </visual>
-    <collision>
-      <origin xyz="0.0 -0.05 -0.48" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/central_body_1.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <!-- <geometry>
-        <cylinder radius="0.216" length="0.342"/>
-      </geometry> -->
-    </collision>
-  </link>
-
-
-  <joint name="joint_cover_base" type="fixed">
-    <origin xyz="0.020 0 0.405" rpy="0 0 0"/>
-    <parent link="chassis"/>
-    <child link="central_body"/>
-  </joint>
-
-  <gazebo reference="central_body">
-    <material>Gazebo/White</material>
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-  </gazebo>
-
-
-
-  <link name="upper_body">
-    <inertial>
-      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
-      <mass value="0.509819302869698"/>
-      <inertia ixx="0.505323" iyy="0.34562" izz="0.302736" ixy="-0.000304" iyz="-0.001097" ixz="-0.112705"/>
-    </inertial>
-    <visual>
-      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/upper_body_1.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="white"/>
-    </visual>
-    <collision>
-      <origin xyz="-0.012447 -0.042954 -0.658" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find robot_sbem)/meshes/upper_body_1.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-
-
-  <joint name="joint_upper_body" type="fixed">
-    <origin xyz="0.0 0.0 0.171" rpy="0 0 0"/> <!-- <origin xyz="0.0 0.0 0.342" rpy="0 0 0"/>-->
-    <parent link="central_body"/>
-    <child link="upper_body"/>
-  </joint>
-
-
-  <gazebo reference="upper_body">
-    <material>Gazebo/White</material>
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-  </gazebo>
-
-
-
-<!-- IMU SECTION-->
-
-<joint name="imu_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="imu"/>
-    <origin xyz="-0.03 0 0.2"/>
+<joint name="joint_castor_wheel_back" type="continuous">
+  <origin xyz="-0.154231 7.6e-05 -0.036123" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="support_castor_back_1"/>
+  <axis xyz="0.0 -0.0 -1.0"/>
 </joint>
 
+<joint name="joint_castor_wheel_back_2" type="continuous">
+  <origin xyz="-0.018973 -0.009866 -0.029977" rpy="0 0 0"/>
+  <parent link="support_castor_back_1"/>
+  <child link="castor_wheel_back_1"/>
+  <axis xyz="-0.0 1.0 -0.0"/>
+</joint>
 
-<link name="imu">
-    <visual>
-        <geometry>
-            <box size="0.01 0.02 0.01"/>
-        </geometry>
-        <material name="black"/>
-    </visual>
-    <collision>
-        <geometry>
-            <box size="0.01 0.02 0.01"/>
-        </geometry>
-    </collision>
-    <xacro:inertial_box mass="0.001" x="0.30" y="0.27" z="0.12">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </xacro:inertial_box>
-</link>
+<joint name="laser_joint" type="fixed">
+  <origin xyz="0.176869 0.018946 0.0182" rpy="0 0 0"/>
+  <parent link="cover_frame_1"/>
+  <child link="laser_frame"/>
+</joint>
 
-<gazebo reference="imu">
-    <material>Gazebo/White</material>
-</gazebo>
+<joint name="joint_imu" type="fixed">
+  <origin xyz="0.015326 0.0 0.03" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="imu_1"/>
+</joint>
 
+<joint name="joint_case_D415" type="fixed">
+  <origin xyz="0.014205 0.019033 0.058" rpy="0 0 0"/>
+  <parent link="cover_frame_1"/>
+  <child link="case_realsensed415_1"/>
+</joint>
+
+<joint name="camera_joint" type="fixed">
+  <origin xyz="0.181 0.007965 0.013995" rpy="0 0 0"/>
+  <parent link="case_realsensed415_1"/>
+  <child link="camera0_link"/>
+</joint>
 
 </robot>
