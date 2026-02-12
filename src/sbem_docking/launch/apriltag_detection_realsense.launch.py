@@ -51,6 +51,11 @@ def generate_launch_description():
         package='isaac_ros_apriltag',
         plugin='nvidia::isaac_ros::apriltag::AprilTagNode',
         name='apriltag',
+        parameters=[{
+            'tag_family': 'tag36h11',
+            'size': 0.075,
+            'max_hamming_distance': 0,
+        }],
         namespace='',
         condition=UnlessCondition(use_composition)
     )
@@ -60,6 +65,11 @@ def generate_launch_description():
         plugin='nvidia::isaac_ros::apriltag::AprilTagNode',
         name='apriltag',
         namespace='',
+        parameters=[{
+            'tag_family': 'tag36h11',
+            'size': 0.075,
+            'max_hamming_distance': 0,
+        }],
         remappings=[
             ('image', '/camera0/camera/color/image_raw'),
             ('camera_info', '/camera0/camera/color/camera_info')

@@ -35,11 +35,12 @@ docking_server:
       charging_threshold: 4.2
 
     # Dock instances
-    docks: ['home_dock']
-    home_dock:
+    docks: ['charging_dock']
+    charging_dock:
       type: 'nova_carter_dock'
       frame: map
-      pose: [-0.6, 10.0, 0.15]
+      pose: [6.92,-0.996, 0.9892916]
+      orientation: [-0.0, -0.0, 0.4747, 0.8801]
 
     controller:
       k_phi: 3.0
