@@ -112,7 +112,7 @@ public:
     left_value = values[0];
     right_value = values[1];
     voltage = values[2];
-    current = values[3];
+    current = values[3] / 1000.0; // convert to A
   }
   void set_motor_values(float val_1, float val_2)
   {

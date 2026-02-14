@@ -131,8 +131,8 @@ hardware_interface::return_type DiffBotSystemHardware::read(
   static int debug_counter = 0;
   if (debug_counter++ % 10 == 0) {
     RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), 
-      "RAW: L_turns=%.4f, R_turns=%.4f | L_pos=%.4f, R_pos=%.4f",
-      wheel_l_.turns, wheel_r_.turns, wheel_l_.pos, wheel_r_.pos);
+      "RAW: L_turns=%.4f, R_turns=%.4f | L_pos=%.4f, R_pos=%.4f, || Battery: Voltage=%.2f V, Current=%.2f A",
+      wheel_l_.turns, wheel_r_.turns, wheel_l_.pos, wheel_r_.pos, battery_.voltage, battery_.current);
   }
 
 
