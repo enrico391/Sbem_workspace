@@ -55,11 +55,13 @@ To allow the container to access USB devices (like the Odrive and ESP32), you ne
 This section explains how to start the apriltag detection node and send messages to the docking server for auto-docking. The docking system is based on AprilTag detection, which provides the robot with the relative pose of the dock. The docking server then uses this information to navigate and align the robot with the dock for charging.
 
 ### Start Apriltag detection:
+1. Launch the apriltag detection node with the RealSense camera:
     ```sh
     ros2 launch sbem_docking apriltag_detection_realsense.launch.py # launched inside a container created by sbem_nvblox_bringup package
     ```
 
 ### Command to send message to docking server:
+- To send a docking command to the docking server, use the following ROS2 action command. This will instruct the robot to navigate to the dock with the specified parameters.
     ```sh
     ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
     {
@@ -71,6 +73,7 @@ This section explains how to start the apriltag detection node and send messages
     ```
 
 ### Command for Undocking: 
+- To send an undocking command to the docking server, use the following ROS2 action command. This will instruct the robot to undock from the dock and move away safely.
     ```sh
     ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
     ```
