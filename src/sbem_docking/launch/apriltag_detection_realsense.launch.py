@@ -53,7 +53,7 @@ def generate_launch_description():
         name='apriltag',
         parameters=[{
             'tag_family': 'tag36h11',
-            'size': 0.075,
+            'size': 0.126,
             'max_hamming_distance': 0,
         }],
         namespace='',
@@ -67,7 +67,7 @@ def generate_launch_description():
         namespace='',
         parameters=[{
             'tag_family': 'tag36h11',
-            'size': 0.075,
+            'size': 0.126,
             'max_hamming_distance': 0,
         }],
         remappings=[
