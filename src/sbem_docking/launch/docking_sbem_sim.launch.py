@@ -22,13 +22,13 @@ def generate_launch_description():
             default_value=os.path.join(
                  get_package_share_directory(
                      'sbem_docking'),
-                 'params', 'sbem_docking_params.yaml'
+                 'params', 'docking_simulation.yaml'
              ),
             description='Full path to the docking param file to load'),
     ]
     
     use_sim_time = LaunchConfiguration('use_sim_time', default='True')
-    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('sbem_docking'),'params', 'sbem_docking_params.yaml'))
+    params_file_dock = LaunchConfiguration('params_file_dock', default=os.path.join(get_package_share_directory('sbem_docking'),'params', 'docking_simulation.yaml'))
     
     docking_server = Node(
         package='opennav_docking',

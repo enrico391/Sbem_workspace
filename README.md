@@ -66,7 +66,7 @@ This section explains how to start the apriltag detection node and send messages
     ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
     {
       use_dock_id: True,
-      dock_id: 'home_dock',
+      dock_id: 'charging_dock',
       dock_type: 'nova_carter_dock',
       navigate_to_staging_pose: true
     }"
