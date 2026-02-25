@@ -12,7 +12,7 @@ def generate_launch_description():
             parameters=[
                 PathJoinSubstitution([
                     get_package_share_directory("robot_sbem"),
-                    "config", "box_filter_laser_sim.yaml",
+                    "config", "box_filter_laser.yaml",
                 ])],
         )
     ])
