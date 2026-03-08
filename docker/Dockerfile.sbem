@@ -63,5 +63,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Switch back to the 'admin' user (standard for Isaac ROS)
 #USER admin
 
+# ======================
+## Installation of uv for ROS package management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Isaac ROS usually expects you to be here:
+WORKDIR /workspaces/isaac_ros-dev
+
+# Blind spot check: Are you trying to use uv for ROS nodes? 
+# Use the --system flag so ROS can find the packages in the global site-packages.
+RUN uv pip install --system setuptools
+
+# ======================
+
 # Set ROS Domain ID
 ENV ROS_DOMAIN_ID=2
