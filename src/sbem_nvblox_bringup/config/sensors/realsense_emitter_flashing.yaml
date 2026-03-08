@@ -21,12 +21,14 @@ serial_no: ''
 usb_port_id: ''
 
 rgb_camera:
-  profile: '640x480x15'
+  color_profile: '640x480x30'
 color_info_qos: "SENSOR_DATA"
 color_qos: "SENSOR_DATA"
 
+
 depth_module:
-  profile: '640x480x60'
+  depth_profile: '640x480x30'
+  infra_profile: '640x480x30'
   emitter_enabled: 1
   emitter_on_off: true
 depth_qos: "SENSOR_DATA"

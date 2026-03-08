@@ -46,7 +46,7 @@
     # Input queues
     maximum_input_queue_length: 10
     # Map clearing settings
-    map_clearing_radius_m: 7.0 # no map clearing if < 0.0
+    map_clearing_radius_m: 5.0 # no map clearing if < 0.0
     map_clearing_frame_id: "base_link"
     # QoS settings
     input_qos: "SYSTEM_DEFAULT"
@@ -57,9 +57,9 @@
     workspace_height_bounds_visualization_side_length: 10.0
     layer_visualization_min_tsdf_weight: 0.1
     layer_visualization_exclusion_height_m: 2.0
-    layer_visualization_exclusion_radius_m: 7.0
+    layer_visualization_exclusion_radius_m: 5.0
     layer_visualization_undo_gamma_correction: false
-    max_back_projection_distance: 7.0
+    max_back_projection_distance: 5.0
     back_projection_subsampling: 1 # no subsampling if == 1
     layer_streamer_bandwidth_limit_mbps: -1.0 # unlimited
 
@@ -72,7 +72,7 @@
       do_depth_preprocessing: false
       depth_preprocessing_num_dilations: 3
       # projective integrator (tsdf/color/occupancy)
-      projective_integrator_max_integration_distance_m: 5.0
+      projective_integrator_max_integration_distance_m: 4.0
       projective_integrator_truncation_distance_vox: 4.0
       projective_integrator_weighting_mode: "inverse_square_tsdf_distance_penalty"
       projective_integrator_max_weight: 5.0
@@ -106,5 +106,5 @@
       tsdf_decayed_free_distance_vox: 4.0
       decay_integrator_deallocate_decayed_blocks: true
       # mesh streamer
-      layer_streamer_exclusion_height_m: 1.8
-      layer_streamer_exclusion_radius_m: 4.0
+      layer_streamer_exclusion_height_m: 1.5
+      layer_streamer_exclusion_radius_m: 2.0
