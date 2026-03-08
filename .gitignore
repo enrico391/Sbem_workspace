@@ -6,3 +6,5 @@ log/
 .vscode/
 *.pyc
 Sbem.code-workspace
+Sbem_AgentV1.0/
+RoboNeuron/
