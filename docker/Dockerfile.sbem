@@ -63,6 +63,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Switch back to the 'admin' user (standard for Isaac ROS)
 #USER admin
 
+# install audio dependencies for voice I/O
+RUN apt-get update && apt-get install -y \
+    libportaudio2 \
+    portaudio19-dev \
+    libasound2-dev \
+    alsa-utils
+    #&& rm -rf /var/lib/apt/lists/*
+
 # ======================
 ## Installation of uv for ROS package management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
