@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.2
     alpha4: 0.2
     alpha5: 0.2
-    base_frame_id: "base_footprint"
+    base_frame_id: "base_link"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -14,7 +14,7 @@ amcl:
     global_frame_id: "map"
     lambda_short: 0.1
     laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
+    laser_max_range: 20.0
     laser_min_range: -1.0
     laser_model_type: "likelihood_field"
     max_beams: 60
@@ -184,21 +184,21 @@ controller_server:
     #   RotateToGoal.lookahead_time: -1.0
     FollowPath:
       plugin: "nav2_mppi_controller::MPPIController"
-      time_steps: 15
-      model_dt: 0.2
-      batch_size: 10000
+      time_steps: 40
+      model_dt: 0.05
+      batch_size: 1000
       vx_std: 0.2
-      vy_std: 0.2
+      vy_std: 0.0
       wz_std: 0.4
-      vx_max: 0.5
+      vx_max: 0.15
       vx_min: 0.0
-      vy_max: 0.5
-      wz_max: 1.9
-      ax_max: 3.0
-      ax_min: -3.0
-      ay_min: -3.0
-      ay_max: 3.0
-      az_max: 3.5
+      vy_max: 0.0
+      wz_max: 0.3
+      ax_max: 0.5
+      ax_min: -0.5
+      ay_min: -0.0
+      ay_max: 0.0
+      az_max: 0.5
       iteration_count: 1
       prune_distance: 1.7
       transform_tolerance: 0.1
@@ -281,7 +281,7 @@ controller_server:
       #   cost_power: 1
       #   cost_weight: 35.0
       #   deadband_velocities: [0.05, 0.05, 0.05]
-      # TwirlingCritic:
+      # TwirlingCritic
       #   enabled: true
       #   twirling_cost_power: 1
       #   twirling_cost_weight: 10.0
@@ -289,8 +289,8 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 3.0
-      publish_frequency: 3.0
+      update_frequency: 10.0
+      publish_frequency: 5.0
       global_frame: odom
       robot_base_frame: base_link
       use_sim_time: False
@@ -305,8 +305,8 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        cost_scaling_factor: 10.0 # change for wall crash 3.0
-        inflation_radius: 0.2 # change for wall crash 
+        cost_scaling_factor: 2.0 # change for wall crash
+        inflation_radius: 0.28 # change for wall crash 
       
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -455,13 +455,13 @@ waypoint_follower:
 velocity_smoother:
   ros__parameters:
     use_sim_time: False
-    smoothing_frequency: 3.0
+    smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP" # change to "CLOSED_LOOP" with kalman filter
-    max_velocity: [0.15, 0.15, 1.0]
-    min_velocity: [-0.15, -0.15, -1.0]
-    max_accel: [1.0, 0.0, 1.5]
-    max_decel: [-0.5, -0.5, -3.2]
+    max_velocity: [0.15, 0.0, 0.3]
+    min_velocity: [-0.15, 0.0, -0.3]
+    max_accel: [0.5, 0.0, 0.5]
+    max_decel: [-0.5, 0.0, -0.5]
     odom_topic: /odom #"/odom" #"/odometry/filtered"   # o /odom/unfiltered without robot_localization package
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
