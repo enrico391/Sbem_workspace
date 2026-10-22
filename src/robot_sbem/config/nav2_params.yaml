@@ -363,7 +363,7 @@ global_costmap:
         plugin: "nvblox::nav2::NvbloxCostmapLayer"
         enabled: True
         nav2_costmap_global_frame: map # must match with global_frame of global_costmap
-        nvblox_map_slice_topic: "/nvblox_node/combined_map_slice"
+        nvblox_map_slice_topic: "/nvblox_node/static_map_slice"
         convert_to_binary_costmap: True
 
       static_layer:
