@@ -9,11 +9,17 @@
     # Rviz visualization
     esdf_slice_bounds_visualization_attachment_frame_id: "camera0_link"
 
+    # Workspace radius where there is the clearing of the map created. Used 3 meter because
+    # I use the nvblox only in the local costmap that is 3x3m
+    map_clearing_radius_m: 3.0
+
     static_mapper:
-      esdf_slice_height: 0.09
+      # max distance for the integration of the depth image
+      projective_integrator_max_integration_distance_m: 2.5
       
-      esdf_slice_min_height: 0.09
-      esdf_slice_max_height: 0.65
+      esdf_slice_height: 0.09
+      esdf_slice_min_height: 0.20
+      esdf_slice_max_height: 0.80
 
     dynamic_mapper:
       esdf_slice_height: 0.0

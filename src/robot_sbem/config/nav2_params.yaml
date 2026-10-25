@@ -299,14 +299,16 @@ local_costmap:
       height: 3
       resolution: 0.05
       robot_radius: 0.24 #0.225
-      footprint: "[[0.24, 0.0], [0.17, 0.17], [0.0, 0.24], [-0.17, 0.17], [-0.24, 0.0], [-0.17, -0.17], [0.0, -0.24], [0.17, -0.17]]"
+      # Encloses the robot's collision-mesh XY projection in base_link, including protrusions.
+      footprint: "[[0.25, 0.085], [0.105, 0.23], [-0.075, 0.23], [-0.215, 0.09], [-0.215, -0.09], [-0.075, -0.23], [0.105, -0.23], [0.25, -0.085]]"
+      footprint_padding: 0.01
       plugins: ["obstacle_layer", "nvblox_layer", "inflation_layer"] # "voxel_layer",
       
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
-        cost_scaling_factor: 2.0 # change for wall crash
-        inflation_radius: 0.28 # change for wall crash 
+        cost_scaling_factor: 5.0 # change for wall crash
+        inflation_radius: 0.30
       
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -338,10 +340,12 @@ global_costmap:
       robot_base_frame: base_link
       use_sim_time: False
       robot_radius: 0.24 # default 0.20 
-      footprint: "[[0.24, 0.0], [0.17, 0.17], [0.0, 0.24], [-0.17, 0.17], [-0.24, 0.0], [-0.17, -0.17], [0.0, -0.24], [0.17, -0.17]]"
+      # Encloses the robot's collision-mesh XY projection in base_link, including protrusions.
+      footprint: "[[0.25, 0.085], [0.105, 0.23], [-0.075, 0.23], [-0.215, 0.09], [-0.215, -0.09], [-0.075, -0.23], [0.105, -0.23], [0.25, -0.085]]"
+      footprint_padding: 0.01
       resolution: 0.05
       track_unknown_space: true
-      plugins: ["static_layer","nvblox_layer", "obstacle_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -372,8 +376,8 @@ global_costmap:
       
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.58
-        inflation_radius: 0.20 #0.45 
+        cost_scaling_factor: 1.50
+        inflation_radius: 0.40
       always_send_full_costmap: True
 
 map_server:
