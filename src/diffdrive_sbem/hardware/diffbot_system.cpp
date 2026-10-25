@@ -29,6 +29,45 @@
 
 namespace diffdrive_sbem
 {
+namespace
+{
+using SteadyClock = std::chrono::steady_clock;
+constexpr std::size_t kTimingReportSamples = 100;
+
+struct TimingStats
+{
+  std::size_t samples = 0;
+  double total_ms = 0.0;
+  double max_ms = 0.0;
+
+  void add(double duration_ms)
+  {
+    ++samples;
+    total_ms += duration_ms;
+    if (duration_ms > max_ms) {
+      max_ms = duration_ms;
+    }
+  }
+
+  double average_ms() const
+  {
+    return samples == 0 ? 0.0 : total_ms / samples;
+  }
+
+  void reset()
+  {
+    samples = 0;
+    total_ms = 0.0;
+    max_ms = 0.0;
+  }
+};
+
+double elapsed_ms(SteadyClock::time_point start, SteadyClock::time_point end)
+{
+  return std::chrono::duration<double, std::milli>(end - start).count();
+}
+}  // namespace
+
 hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   const hardware_interface::HardwareInfo & info)
 {
@@ -124,7 +163,28 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
 hardware_interface::return_type DiffBotSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
+  static SteadyClock::time_point previous_read_start{};
+  static TimingStats cycle_period;
+  static TimingStats encoder_request;
+
+  const auto read_start = SteadyClock::now();
+  if (previous_read_start != SteadyClock::time_point{}) {
+    cycle_period.add(elapsed_ms(previous_read_start, read_start));
+  }
+  previous_read_start = read_start;
+
   comms_.read_values(wheel_l_.turns, wheel_r_.turns, battery_.voltage, battery_.current);
+  encoder_request.add(elapsed_ms(read_start, SteadyClock::now()));
+
+  if (encoder_request.samples == kTimingReportSamples) {
+    RCLCPP_INFO(
+      rclcpp::get_logger("DiffBotSystemHardware"),
+      "TIMING (%zu reads): cycle avg=%.2f ms max=%.2f ms; encoder request avg=%.2f ms max=%.2f ms",
+      encoder_request.samples, cycle_period.average_ms(), cycle_period.max_ms,
+      encoder_request.average_ms(), encoder_request.max_ms);
+    cycle_period.reset();
+    encoder_request.reset();
+  }
 
 
   // Debug: Log raw encoder values
@@ -155,6 +215,8 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 { 
+  static TimingStats motor_command;
+
   //std::cout << "Writing motor commands: L: " << wheel_l_.cmd << " R: " << wheel_r_.cmd << std::endl;
   
   double motor_l_counts_per_loop = - wheel_l_.cmd / (2 * M_PI);
@@ -164,7 +226,17 @@ hardware_interface::return_type diffdrive_sbem ::DiffBotSystemHardware::write(
   //std::cout << "Motor L counts per loop: " << motor_l_counts_per_loop << std::endl;
   //std::cout << "Motor R counts per loop: " << motor_r_counts_per_loop << std::endl;
 
+  const auto write_start = SteadyClock::now();
   comms_.set_motor_values(static_cast<float>(motor_l_counts_per_loop), static_cast<float>(motor_r_counts_per_loop));
+  motor_command.add(elapsed_ms(write_start, SteadyClock::now()));
+
+  if (motor_command.samples == kTimingReportSamples) {
+    RCLCPP_INFO(
+      rclcpp::get_logger("DiffBotSystemHardware"),
+      "TIMING (%zu writes): motor command avg=%.2f ms max=%.2f ms",
+      motor_command.samples, motor_command.average_ms(), motor_command.max_ms);
+    motor_command.reset();
+  }
 
   return hardware_interface::return_type::OK;
 }
