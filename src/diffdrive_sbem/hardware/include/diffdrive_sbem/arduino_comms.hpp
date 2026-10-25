@@ -3,6 +3,7 @@
 
 // #include <cstring>
 #include <sstream>
+#include <limits>
 // #include <cstdlib>
 #include <vector>
 #include <libserial/SerialPort.h>
@@ -85,7 +86,9 @@ public:
     std::string response = send_msg("\r");
   }
 
-  void read_values(float &left_value, float &right_value, double &voltage, double &current)
+  void read_values(
+    float &left_value, float &right_value, double &voltage, double &current,
+    double &odrive_right_ms, double &odrive_left_ms)
   {
     std::string response = send_msg("e\r");
 
@@ -113,6 +116,9 @@ public:
     right_value = values[1];
     voltage = values[2];
     current = values[3] / 1000.0; // convert to A
+    // Older ESP32 firmware sends only the first four values.
+    odrive_right_ms = values.size() >= 6 ? values[4] / 1000.0 : std::numeric_limits<double>::quiet_NaN();
+    odrive_left_ms = values.size() >= 6 ? values[5] / 1000.0 : std::numeric_limits<double>::quiet_NaN();
   }
   void set_motor_values(float val_1, float val_2)
   {
