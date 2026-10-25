@@ -78,3 +78,5 @@ This section explains how to start the apriltag detection node and send messages
     ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
     ```
 
+## Firmware on ESP32
+The ESP32 is responsible for controlling the Odrive via UART. The firmware for the ESP32 is located at this [page](https://github.com/enrico391/ROS2_communicationES32/tree/ros2_control_version)
