@@ -5,11 +5,12 @@ scan_to_scan_filter_chain:
       type: laser_filters/LaserScanBoxFilter
       params:
         box_frame: base_link
+        # CAD envelope near lidar height with a small margin; verify against real self-returns.
         max_x: 0.25
-        max_y: 0.25
+        max_y: 0.24
         max_z: 0.5
-        min_x: -0.30
-        min_y: -0.25
+        min_x: -0.22
+        min_y: -0.24
         min_z: -0.5
         
-        invert: false # activate to remove all points outside of the box
+        invert: false # Remove self-returns inside the box.
