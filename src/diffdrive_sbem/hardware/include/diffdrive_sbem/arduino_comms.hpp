@@ -8,6 +8,7 @@
 #include <vector>
 #include <libserial/SerialPort.h>
 #include <iostream>
+#include "diffdrive_sbem/controller_response.hpp"
 
 
 LibSerial::BaudRate convert_baud_rate(int baud_rate)
@@ -86,39 +87,22 @@ public:
     std::string response = send_msg("\r");
   }
 
-  void read_values(
+  bool read_values(
     float &left_value, float &right_value, double &voltage, double &current,
-    double &odrive_right_ms, double &odrive_left_ms)
+    double &odrive_right_ms, double &odrive_left_ms, std::array<double, 6> &imu)
   {
-    std::string response = send_msg("e\r");
-
-    //std::string delimiter = " ";
-
-    // get stream from the message
-    std::istringstream iss(response);
-
-    std::vector<float> values;
-    float number;
-
-    // put values inside the vector
-    while (iss >> number) {
-        values.push_back(number);
-    }
-
-    // size_t del_pos = response.find(delimiter);
-    // std::string val2 = response.substr(0, del_pos);
-    // std::string second_part = response.substr(del_pos + delimiter.length());
-    // del_pos = second_part.find(delimiter);
-    // std::string val1 = second_part.substr(0, del_pos);
-    // std::string voltage_string = second_part.substr(del_pos + delimiter.length());
-    
-    left_value = values[0];
-    right_value = values[1];
-    voltage = values[2];
-    current = values[3] / 1000.0; // convert to A
-    // Older ESP32 firmware sends only the first four values.
-    odrive_right_ms = values.size() >= 6 ? values[4] / 1000.0 : std::numeric_limits<double>::quiet_NaN();
-    odrive_left_ms = values.size() >= 6 ? values[5] / 1000.0 : std::numeric_limits<double>::quiet_NaN();
+    imu.fill(std::numeric_limits<double>::quiet_NaN());
+    odrive_right_ms = odrive_left_ms = std::numeric_limits<double>::quiet_NaN();
+    diffdrive_sbem::ControllerResponse response;
+    if (!diffdrive_sbem::parse_controller_response(send_msg("e\r"), response)) return false;
+    left_value = response.left;
+    right_value = response.right;
+    voltage = response.voltage;
+    current = response.current;
+    odrive_right_ms = response.odrive_right_ms;
+    odrive_left_ms = response.odrive_left_ms;
+    imu = response.imu;
+    return true;
   }
   void set_motor_values(float val_1, float val_2)
   {

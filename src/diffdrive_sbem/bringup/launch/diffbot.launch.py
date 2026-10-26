@@ -14,11 +14,12 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
 
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -77,7 +78,9 @@ def generate_launch_description():
             use_sim_time
         ]
     )
-    robot_description = {"robot_description": robot_description_content}
+    robot_description = {
+        "robot_description": ParameterValue(robot_description_content, value_type=str)
+    }
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -99,7 +102,8 @@ def generate_launch_description():
             ("~/robot_description", "/robot_description"),
             ("/diffbot_base_controller/cmd_vel", "/cmd_vel_stamped"),
             ("/diffbot_base_controller/odom", "/odom"),
-            ("/battery_state_broadcaster/battery_state", "/battery_state")
+            ("/battery_state_broadcaster/battery_state", "/battery_state"),
+            ("/imu_sensor_broadcaster/imu", "/imu_data"),
         ],
     )
     robot_state_pub_node = Node(
@@ -135,6 +139,13 @@ def generate_launch_description():
         arguments=["battery_state_broadcaster"],
     )
 
+    imu_sensor_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["imu_sensor_broadcaster", "--controller-manager", "/controller_manager"],
+        condition=UnlessCondition(use_sim_time),
+    )
+
     # Delay rviz start after `joint_state_broadcaster`
     # delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
     #     event_handler=OnProcessExit(
@@ -157,6 +168,7 @@ def generate_launch_description():
         robot_state_pub_node,
         robot_controller_spawner,
         battery_state_broadcaster_spawner,
+        imu_sensor_broadcaster_spawner,
         # delay_rviz_after_joint_state_broadcaster_spawner,
         delay_joint_state_broadcaster_after_robot_controller_spawner,
     ]

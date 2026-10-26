@@ -14,6 +14,7 @@
 
 #include "diffdrive_sbem/diffbot_system.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -87,6 +88,8 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
   cfg_.timeout_ms = std::stoi(info_.hardware_parameters["timeout_ms"]);
   cfg_.enc_counts_per_rev = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
   cfg_.battery_name = info_.hardware_parameters["battery_name"];
+  const auto imu_name = info_.hardware_parameters.find("imu_name");
+  if (imu_name != info_.hardware_parameters.end()) cfg_.imu_name = imu_name->second;
 
   std::cout << "ENC COUNTS PER REV: " << cfg_.enc_counts_per_rev << std::endl;
   
@@ -121,6 +124,15 @@ std::vector<hardware_interface::StateInterface> DiffBotSystemHardware::export_st
         battery_.name, "current", &battery_.current));
 
 
+  if (!cfg_.imu_name.empty()) {
+    const std::array<std::string, 10> names{{
+      "orientation.x", "orientation.y", "orientation.z", "orientation.w",
+      "angular_velocity.x", "angular_velocity.y", "angular_velocity.z",
+      "linear_acceleration.x", "linear_acceleration.y", "linear_acceleration.z"}};
+    for (size_t n = 0; n < names.size(); ++n) {
+      state_interfaces.emplace_back(cfg_.imu_name, names[n], &imu_state_[n]);
+    }
+  }
   return state_interfaces;
 }
 
@@ -146,6 +158,8 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_activate(
 
   // Check if the device is connected
   comms_.connect(cfg_.device, cfg_.baud_rate, cfg_.timeout_ms);
+  std::fill(imu_state_.begin() + 4, imu_state_.end(),
+    std::numeric_limits<double>::quiet_NaN());
 
   RCLCPP_INFO(rclcpp::get_logger("DiffDriveArduinoHardware"), "Successfully activated!");
 
@@ -156,6 +170,8 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   comms_.disconnect();
+  std::fill(imu_state_.begin() + 4, imu_state_.end(),
+    std::numeric_limits<double>::quiet_NaN());
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -177,9 +193,14 @@ hardware_interface::return_type DiffBotSystemHardware::read(
 
   double odrive_right_ms = std::numeric_limits<double>::quiet_NaN();
   double odrive_left_ms = std::numeric_limits<double>::quiet_NaN();
+  std::array<double, 6> imu;
   comms_.read_values(
     wheel_l_.turns, wheel_r_.turns, battery_.voltage, battery_.current,
-    odrive_right_ms, odrive_left_ms);
+    odrive_right_ms, odrive_left_ms, imu);
+  for (size_t n = 0; n < 3; ++n) {
+    imu_state_[4 + n] = imu[3 + n];
+    imu_state_[7 + n] = imu[n];
+  }
   encoder_request.add(elapsed_ms(read_start, SteadyClock::now()));
   if (std::isfinite(odrive_right_ms) && std::isfinite(odrive_left_ms)) {
     odrive_right_read.add(odrive_right_ms);

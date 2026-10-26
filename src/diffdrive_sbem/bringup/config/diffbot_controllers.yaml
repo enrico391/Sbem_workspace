@@ -11,6 +11,9 @@ controller_manager:
     battery_state_broadcaster:
       type: battery_state_broadcaster/BatteryStateBroadcaster
 
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
 diffbot_base_controller:
   ros__parameters:
     left_wheel_names: ["left_wheel_joint"]
@@ -66,3 +69,13 @@ battery_state_broadcaster:
     design_capacity: 100.0
     # https://github.com/ros2/common_interfaces/blob/rolling/sensor_msgs/msg/BatteryState.msg
     power_supply_technology: 0
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: "imu"
+    frame_id: "imu_1"
+    # Raw accelerometer/gyro only; there is no orientation estimate.
+    static_covariance_orientation: [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # Zero covariance means unknown; measure sensor noise before tuning these.
+    static_covariance_angular_velocity: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    static_covariance_linear_acceleration: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

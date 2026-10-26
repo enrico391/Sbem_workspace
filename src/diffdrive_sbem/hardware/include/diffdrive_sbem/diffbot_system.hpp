@@ -15,6 +15,7 @@
 #ifndef DIFFDRIVE_SBEM__DIFFBOT_SYSTEM_HPP_
 #define DIFFDRIVE_SBEM__DIFFBOT_SYSTEM_HPP_
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -49,6 +50,7 @@ struct Config
   int timeout_ms = 0;
   int enc_counts_per_rev = 0;
   std::string battery_name = "";
+  std::string imu_name = "";
 };
 
 public:
@@ -82,6 +84,9 @@ private:
   Wheel wheel_l_;
   Wheel wheel_r_;
   Battery battery_;
+  // Orientation is unavailable; the broadcaster marks its covariance as -1.
+  std::array<double, 10> imu_state_{{0, 0, 0, 1,
+    NAN, NAN, NAN, NAN, NAN, NAN}};
 };
 
 }  // namespace diffdrive_sbem

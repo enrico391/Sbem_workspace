@@ -62,7 +62,13 @@ install(TARGETS diffdrive_sbem
 )
 
 if(BUILD_TESTING)
+  add_executable(controller_response_test test/controller_response_test.cpp)
+  target_compile_features(controller_response_test PRIVATE cxx_std_17)
+  target_include_directories(controller_response_test PRIVATE hardware/include)
+  add_test(NAME controller_response_test COMMAND controller_response_test)
   find_package(ament_cmake_pytest REQUIRED)
+
+  ament_add_pytest_test(imu_description test/test_imu_description.py)
 
   ament_add_pytest_test(example_2_urdf_xacro test/test_urdf_xacro.py)
   ament_add_pytest_test(run_example_2_launch test/test_diffbot_launch.py)
