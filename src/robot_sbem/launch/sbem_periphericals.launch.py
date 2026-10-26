@@ -43,15 +43,7 @@ def generate_launch_description():
         ])
     )
 
-    imu_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(
-                FindPackageShare('mpu6050driver_jetson').find('mpu6050driver_jetson'),
-                'launch',
-                'mpu6050driver_launch.py'
-            )
-        ])
-    )
+    # The ESP32 MPU6050 is published by diffbot's imu_sensor_broadcaster.
     # camera_publisher = Node(
     #         package='v4l2_camera',
     #         executable='v4l2_camera_node',
@@ -102,7 +94,6 @@ def generate_launch_description():
         lidar,
         lidar_filter,
         ros2_control_node,
-        imu_node
         # camera_publisher,
         # audio_listener_node,
         #node_republisher_camera,
