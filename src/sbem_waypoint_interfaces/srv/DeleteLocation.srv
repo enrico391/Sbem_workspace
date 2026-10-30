@@ -1,0 +1,6 @@
+string name
+# Empty selects the current map.
+string map_id
+---
+bool success
+string message

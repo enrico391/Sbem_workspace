@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>sbem_waypoint_manager</name>
+  <version>0.1.0</version>
+  <description>SQLite-backed named robot poses with associated maps and Nav2 goal dispatch.</description>
+  <maintainer email="enrimoro003@gmail.com">Enrico Moro</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>tf2_ros_py</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>sbem_waypoint_interfaces</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>action_msgs</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

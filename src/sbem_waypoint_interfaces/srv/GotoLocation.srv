@@ -1,0 +1,9 @@
+string name
+# Empty selects the current map. Other maps are rejected for navigation.
+string map_id
+---
+# True means Nav2 accepted the goal, not that the robot arrived.
+bool success
+string message
+# Accepted Nav2 goal UUID, formatted as 32 hexadecimal characters.
+string goal_id

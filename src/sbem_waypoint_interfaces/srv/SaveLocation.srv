@@ -1,0 +1,6 @@
+string name
+bool overwrite
+---
+bool success
+string message
+sbem_waypoint_interfaces/Location location

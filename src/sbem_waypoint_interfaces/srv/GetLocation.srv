@@ -1,0 +1,7 @@
+string name
+# Empty selects the current map.
+string map_id
+---
+bool success
+string message
+sbem_waypoint_interfaces/Location location
