@@ -136,7 +136,11 @@ def generate_launch_description():
     battery_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["battery_state_broadcaster"],
+        arguments=[
+            "battery_state_broadcaster",
+            "--controller-manager", "/controller_manager",
+            "--param-file", robot_controllers,
+        ],
     )
 
     imu_sensor_broadcaster_spawner = Node(
