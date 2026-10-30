@@ -7,6 +7,7 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import LaunchConfiguration
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
@@ -29,6 +30,14 @@ def generate_launch_description():
         description='The name of container that nodes will load in if use composition')
     
     use_sim_time = LaunchConfiguration('use_sim_time')
+    declare_enable_autonomy_cmd = DeclareLaunchArgument(
+        'enable_autonomy', default_value='false',
+        description='Start automatic low-battery docking supervision')
+    autonomy_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            get_package_share_directory('sbem_autonomy'), 'launch', 'autonomy.launch.py')),
+        launch_arguments={'use_sim_time': use_sim_time}.items(),
+        condition=IfCondition(LaunchConfiguration('enable_autonomy')))
     use_composition = LaunchConfiguration('use_composition')
     container_name = LaunchConfiguration('container_name')  
 
@@ -85,6 +94,7 @@ def generate_launch_description():
     # Launch!
     return LaunchDescription([
         declare_use_sim_time_cmd,
+        declare_enable_autonomy_cmd,
         declare_use_composition_cmd,
         declare_container_name_cmd,
         #apriltag_detector_realsense_node,
@@ -92,6 +102,7 @@ def generate_launch_description():
         localization_node,
         navigation_node,
         docking_node,
+        autonomy_node,
         # ros_bridge_server,
         # server_stt,
     ])
