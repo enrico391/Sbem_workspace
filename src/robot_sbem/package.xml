@@ -13,6 +13,7 @@
   <test_depend>ament_lint_common</test_depend>
 
   <depend>opennav_docking</depend>
+  <exec_depend>sbem_autonomy</exec_depend>
   <depend>navigation2</depend>
   <depend>rclcpp</depend>
   <depend>navigation_msgs</depend>
