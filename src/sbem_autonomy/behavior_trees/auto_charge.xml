@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="AutoCharge">
+  <BehaviorTree ID="AutoCharge">
+    <ReactiveSequence>
+      <BatteryFresh/>
+      <ReactiveFallback>
+        <Inverter><RechargeRequired/></Inverter>
+        <Sequence>
+          <Fallback>
+            <IsCharging/>
+            <Sequence>
+              <CancelNavigation/>
+              <Timeout msec="{docking_timeout_ms}">
+                <DockRobot dock_id="{dock_id}" use_dock_id="true"
+                           navigate_to_staging_pose="true" server_name="{docking_action}"/>
+              </Timeout>
+            </Sequence>
+          </Fallback>
+          <WaitForRecharge/>
+        </Sequence>
+      </ReactiveFallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+</root>

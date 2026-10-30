@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-ros2-controllers \
     ros-humble-twist-stamper \
     ros-humble-opennav-docking \
+    ros-humble-opennav-docking-bt \
     libserial-dev
     #&& rm -rf /var/lib/apt/lists/*
 

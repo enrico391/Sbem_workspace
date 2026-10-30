@@ -1,0 +1,20 @@
+sbem_autonomy:
+  ros__parameters:
+    enabled: true
+    battery_topic: /battery_state
+    # BatteryState.percentage uses 0-1, including the updated SBEM broadcaster.
+    low_battery_threshold: 0.30
+    recharge_complete_threshold: 0.99
+    low_battery_duration: 5.0
+    battery_timeout: 5.0
+    dock_id: charging_dock
+    docking_action: /dock_robot
+    navigation_actions: [/navigate_to_pose, /navigate_through_poses]
+    tick_period_ms: 100
+    cancel_timeout: 10.0
+    docking_timeout: 240.0
+    charge_timeout: 21600.0
+    charging_loss_timeout: 30.0
+    # Each docking action also has its own retries in sbem_docking's config.
+    max_attempts: 3
+    retry_delay: 30.0
