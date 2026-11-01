@@ -32,7 +32,7 @@ EMITTER_ON_CONFIG_FILE_PATH = lu.get_path('sbem_nvblox_bringup', 'config/sensors
 # NOTE(alexmillane, 16.08.2024): At the moment this is the *only* behaviour we support.
 def get_default_run_splitter_list(num_cameras: int) -> List[bool]:
     run_splitter_list = [False] * num_cameras
-    run_splitter_list[0] = True
+    run_splitter_list[0] = False
     return run_splitter_list
 
 

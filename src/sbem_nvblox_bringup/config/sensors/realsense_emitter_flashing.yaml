@@ -30,7 +30,7 @@ depth_module:
   depth_profile: '640x480x30'
   infra_profile: '640x480x30'
   emitter_enabled: 1
-  emitter_on_off: true
+  emitter_on_off: false
 depth_qos: "SENSOR_DATA"
 depth_info_qos: "SENSOR_DATA"
 
