@@ -44,7 +44,7 @@ To allow the container to access USB devices (like the Odrive and ESP32), you ne
     ```sh
     ros2 launch robot_sbem sbem_periphericals.launch.py # launch lidar node (and laser filter), ros2_control communication with esp32, imu node
 
-    ros2 launch robot_sbem sbem_loc_nav_dock.launch.py # launch localization, nav2 and docking server
+    ros2 launch robot_sbem sbem_loc_nav_dock.launch.py enable_autonomy:=true # launch localization, nav2 and docking server
     ```
 3. If you want to use 3D perception for mapping and collision avoidance, you can start the nvblox server:
     ```sh
@@ -77,6 +77,9 @@ This section explains how to start the apriltag detection node and send messages
     ```sh
     ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
     ```
+
+## Waypoint manager:
+The package [`sbem_waypoint_manager`](<https://github.com/enrico391/Sbem_workspace/tree/jetson_container/src/sbem_waypoint_manager>) provides a simple interface to manage waypoints for the robot. It allows you to add, remove, and list waypoints, which can be used for navigation. 
 
 ## Firmware on ESP32
 The ESP32 is responsible for controlling the Odrive via UART. The firmware for the ESP32 is located at this [page](https://github.com/enrico391/ROS2_communicationES32/tree/ros2_control_version)
