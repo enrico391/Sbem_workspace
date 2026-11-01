@@ -32,15 +32,15 @@ def generate_launch_description():
     use_composition = LaunchConfiguration('use_composition')
     container_name = LaunchConfiguration('container_name')  
 
-    lidar_filter = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(
-                FindPackageShare('robot_sbem').find('robot_sbem'),
-                'launch',
-                'footprint_filter_laser_sim.launch.py'
-            )
-        ])
-    )
+    # lidar_filter = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([
+    #         os.path.join(
+    #             FindPackageShare('robot_sbem').find('robot_sbem'),
+    #             'launch',
+    #             'footprint_filter_laser_sim.launch.py'
+    #         )
+    #     ])
+    # )
 
     localization_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(
@@ -85,7 +85,6 @@ def generate_launch_description():
         declare_container_name_cmd,
         #apriltag_detector_realsense_node,
         dock_pose_publisher,
-        lidar_filter,
         localization_node,
         navigation_node,
         docking_node,

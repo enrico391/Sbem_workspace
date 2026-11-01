@@ -12,15 +12,15 @@ slam_toolbox:
     # ROS Parameters
     odom_frame: odom
     map_frame: map
-    base_frame: base_footprint
-    scan_topic: /scan_filtered  # or /scan without filter
-    mode: mapping #localization #mapping #mapping 
+    base_frame: base_link
+    scan_topic: /scan  # or /scan without filter
+    mode: localization #localization #mapping 
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given  /home/morolinux/Documents/sbem_project_ws/map_primopiano_complete_serial.data
     # will use pose
-    # map_file_name: /home/morolinux/Projects/Sbem/sbem_project_ws/src/robot_sbem/maps/map_primopiano_complete_serial.data
-    # # map_start_pose: [0.0, 0.0, 0.0]
+    #map_file_name: /mnt/nova_ssd/workspaces/isaac_ros-dev/src/Sbem_workspace/src/robot_sbem/maps/map_terra.posegraph
+    #map_start_pose: [0.0, 0.0, 0.0]
     # map_start_at_dock: true
 
     debug_logging: false
