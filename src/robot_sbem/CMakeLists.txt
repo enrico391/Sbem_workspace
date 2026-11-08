@@ -84,23 +84,6 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-#for scripts
-install(PROGRAMS
-  scripts/diff_tf.py
-  DESTINATION lib/${PROJECT_NAME}
-)
-#for scripts
-install(PROGRAMS
-  scripts/imu_tf.py
-  DESTINATION lib/${PROJECT_NAME}
-)
-#for scripts
-install(PROGRAMS
-  scripts/pub_odom_sbem.py
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-
 ament_export_include_directories(include)
 ament_export_dependencies(${dependencies})
 
