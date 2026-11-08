@@ -79,7 +79,7 @@ def generate_launch_description():
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='False',
+        default_value='True',
         description='Use simulation (Gazebo) clock if true')
 
     declare_params_file_cmd = DeclareLaunchArgument(
@@ -148,7 +148,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings),
+                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
             Node(
                 package='nav2_bt_navigator',
                 executable='bt_navigator',
@@ -180,17 +180,6 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
                         [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
-            # Add cmd_vel to cmd_vel_stamped converter
-            Node(
-                package='twist_stamper',
-                executable='twist_stamper',
-                name='twist_stamper',
-                output='screen',
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[{'use_sim_time': use_sim_time}],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=[('cmd_vel_in', 'cmd_vel'), ('cmd_vel_out', 'cmd_vel_stamped')]),            
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
@@ -230,7 +219,7 @@ def generate_launch_description():
                 plugin='behavior_server::BehaviorServer',
                 name='behavior_server',
                 parameters=[configured_params],
-                remappings=remappings),
+                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
             ComposableNode(
                 package='nav2_bt_navigator',
                 plugin='nav2_bt_navigator::BtNavigator',
@@ -260,6 +249,18 @@ def generate_launch_description():
         ],
     )
 
+    # The base consumes stamped, smoothed commands in either launch mode.
+    twist_stamper_node = Node(
+        package='twist_stamper',
+        executable='twist_stamper',
+        name='twist_stamper',
+        output='screen',
+        respawn=use_respawn,
+        respawn_delay=2.0,
+        parameters=[{'use_sim_time': use_sim_time}],
+        arguments=['--ros-args', '--log-level', log_level],
+        remappings=[('cmd_vel_in', 'cmd_vel'), ('cmd_vel_out', 'cmd_vel_stamped')])
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -278,5 +279,6 @@ def generate_launch_description():
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
+    ld.add_action(twist_stamper_node)
 
     return ld
