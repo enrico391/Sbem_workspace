@@ -14,7 +14,12 @@
 
   <depend>opennav_docking</depend>
   <exec_depend>sbem_autonomy</exec_depend>
+  <exec_depend>sbem_nvblox_bringup</exec_depend>
+  <exec_depend>sbem_waypoint_manager</exec_depend>
+  <exec_depend>sbem_waypoint_interfaces</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
   <depend>navigation2</depend>
+  <exec_depend>twist_stamper</exec_depend>
   <depend>rclcpp</depend>
   <depend>navigation_msgs</depend>
   <depend>tf2_ros</depend>
