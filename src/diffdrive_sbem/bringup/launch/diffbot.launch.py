@@ -105,6 +105,7 @@ def generate_launch_description():
             ("/battery_state_broadcaster/battery_state", "/battery_state"),
             ("/imu_sensor_broadcaster/imu", "/imu_data"),
         ],
+        arguments=['--ros-args', '--log-level', 'warn'],
     )
     robot_state_pub_node = Node(
         package="robot_state_publisher",
