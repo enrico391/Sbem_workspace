@@ -23,9 +23,9 @@ diffbot_base_controller:
     #wheels_per_side: 1  # actually 2, but both are controlled by 1 signal
     wheel_radius: 0.08
 
-    wheel_separation_multiplier: 1.0
-    left_wheel_radius_multiplier: 1.0
-    right_wheel_radius_multiplier: 1.0
+    wheel_separation_multiplier: 0.92532
+    left_wheel_radius_multiplier: 1.0515
+    right_wheel_radius_multiplier: 1.0515
 
     publish_rate: 50.0  # Hz; matches the hardware update rate
     odom_frame_id: odom
