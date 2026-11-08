@@ -12,6 +12,7 @@ The idea behind this robot is to use it for helping people in houses and use it 
 </div>
 
 ## Main Components
+
 - **Two motors** from a hoverboard
 - **Odrive 3.6** for motor control
 - **Jetson Orin nano** for communication with the server PC and ROS2 framework
@@ -20,33 +21,51 @@ The idea behind this robot is to use it for helping people in houses and use it 
 - **Lidar A1** for navigation and Nav2 usage
 - **LCD Screen** for GUI interface and simple debugging on Raspberry Pi
 - **Microphone** for human-machine interaction *(TODO: Implement an array mic for spatial detection)*
-- **(TODO) Intel RealSense D415** for 3D perception
+- **Intel RealSense D415** for 3D perception
 
 ---
 
 
 
-# Simple Guide to Start the Robot
+## Simple Guide to Start the Robot
 The entire system runs inside an Isaac ROS container, which is built using the `isaac_ros_common` package. A pre-built image is available in the package, but I include the [Dockerfile](./docker/Dockerfile.sbem) to install all dependencies required for the robot.
 
 ### Permission to Access USB Devices
 To allow the container to access USB devices (like the Odrive and ESP32), you need to set up udev rules on your host machine. This will enable the container to communicate with the hardware components without running into permission issues.
 
-## Steps to Start the Robot
+### Steps to Start the Robot
+
 1. Navigate to the project workspace:
 
    ```sh
-   cd sbem_project_ws
+   cd /workspaces/isaac_ros-dev/src/sbem_ws
    source install/setup.bash
    ```
 
-2. Start essential nodes
-    ```sh
-    ros2 launch robot_sbem sbem_periphericals.launch.py # launch lidar node (and laser filter), ros2_control communication with esp32, imu node
+2. Start the full robot bringup:
 
-    ros2 launch robot_sbem sbem_loc_nav_dock.launch.py enable_autonomy:=true # launch localization, nav2 and docking server
+   ```sh
+   ros2 launch robot_sbem sbem_bringup.launch.py
+   ```
+
+   This starts the lidar, ros2_control with ESP32 communication and IMU data,
+   localization, Nav2, docking server, waypoint manager, RealSense camera,
+   AprilTag detection and rosbridge on port `9090`. Automatic low-battery
+   docking is enabled by default; add `enable_autonomy:=false` to disable it.
+
+   To start only the essential subsystems separately, run these commands in
+   separate terminals with the workspace sourced:
+
+    ```sh
+    ros2 launch robot_sbem sbem_periphericals.launch.py
+
+    ros2 launch robot_sbem sbem_loc_nav_dock.launch.py enable_autonomy:=true
     ```
+
+   See [robot_sbem](src/robot_sbem/README.md) for the main launch and configuration files.
+
 3. If you want to use 3D perception for mapping and collision avoidance, you can start the nvblox server:
+
     ```sh
     ros2 launch sbem_nvblox_bringup sbem_realsense_nvblox.launch.py # launched inside a container
     ```
@@ -55,12 +74,18 @@ To allow the container to access USB devices (like the Odrive and ESP32), you ne
 This section explains how to start the apriltag detection node and send messages to the docking server for auto-docking. The docking system is based on AprilTag detection, which provides the robot with the relative pose of the dock. The docking server then uses this information to navigate and align the robot with the dock for charging.
 
 ### Start Apriltag detection:
+
+The full robot bringup already starts the RealSense camera and AprilTag detection.
+For a separate launch with the camera component container running:
+
 1. Launch the apriltag detection node with the RealSense camera:
+
     ```sh
     ros2 launch sbem_docking apriltag_detection_realsense.launch.py # launched inside a container created by sbem_nvblox_bringup package
     ```
 
 ### Command to send message to docking server:
+
 - To send a docking command to the docking server, use the following ROS2 action command. This will instruct the robot to navigate to the dock with the specified parameters.
     ```sh
     ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
@@ -73,13 +98,14 @@ This section explains how to start the apriltag detection node and send messages
     ```
 
 ### Command for Undocking: 
+
 - To send an undocking command to the docking server, use the following ROS2 action command. This will instruct the robot to undock from the dock and move away safely.
     ```sh
     ros2 action send_goal /undock_robot opennav_docking_msgs/action/UndockRobot "{dock_type: 'nova_carter_dock'}"
     ```
 
 ## Waypoint manager:
-The package [`sbem_waypoint_manager`](<https://github.com/enrico391/Sbem_workspace/tree/jetson_container/src/sbem_waypoint_manager>) provides a simple interface to manage waypoints for the robot. It allows you to add, remove, and list waypoints, which can be used for navigation. 
+The package [`sbem_waypoint_manager`](src/sbem_waypoint_manager/README.md) provides a simple interface to manage waypoints for the robot. It allows you to save, retrieve, remove, and list named locations, and navigate to them with Nav2. Locations and map snapshots are stored in SQLite. The full robot bringup starts it automatically.
 
 ## Firmware on ESP32
 The ESP32 is responsible for controlling the Odrive via UART. The firmware for the ESP32 is located at this [page](https://github.com/enrico391/ROS2_communicationES32/tree/ros2_control_version)
