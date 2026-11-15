@@ -1,0 +1,11 @@
+string name
+# Empty selects the current map. A non-current map is rejected when saving.
+string map_id
+# Explicit pose in the manager's configured global_frame; orientation is a quaternion.
+# A zero timestamp uses the current time for captured_at.
+geometry_msgs/PoseStamped pose
+bool overwrite
+---
+bool success
+string message
+sbem_waypoint_interfaces/Location location

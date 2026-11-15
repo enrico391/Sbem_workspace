@@ -19,6 +19,7 @@ from tf2_ros import Buffer, TransformException, TransformListener
 from sbem_waypoint_interfaces.msg import Location as LocationMessage
 from sbem_waypoint_interfaces.srv import (
     DeleteLocation, GetLocation, GetMap, GotoLocation, ListLocations, SaveLocation,
+    SaveLocationPose,
 )
 from .navigation import GoalDispatcher
 from .storage import MapSnapshot, WaypointStore
@@ -73,6 +74,7 @@ class WaypointManager(Node):
         self._waypoint_services = []
         for service_type, name, callback in (
             (SaveLocation, 'save_location', self._save),
+            (SaveLocationPose, 'save_location_pose', self._save_pose),
             (GetLocation, 'get_location', self._get),
             (ListLocations, 'list_locations', self._list),
             (DeleteLocation, 'delete_location', self._delete),
@@ -157,6 +159,24 @@ class WaypointManager(Node):
             pose = (translation.x, translation.y, translation.z,
                     rotation.x, rotation.y, rotation.z, rotation.w)
             saved = self.store.save(request.name, self._map, pose, captured_ns, request.overwrite)
+            response.location = self._location_message(saved)
+        response.success, response.message = True, 'Location saved'
+        return response
+
+    def _save_pose(self, request, response):
+        with self._state_lock:
+            self._resolve_map('')
+            if self._resolve_map(request.map_id) != self._map_id:
+                raise ValueError('Cannot save a location on a non-current map')
+            if request.pose.header.frame_id != self.settings['global_frame']:
+                raise ValueError('Pose frame does not match global_frame')
+            stamp = request.pose.header.stamp
+            captured_ns = stamp.sec * 10**9 + stamp.nanosec
+            if captured_ns == 0:
+                captured_ns = self.get_clock().now().nanoseconds
+            saved = self.store.save(
+                request.name, self._map, pose_values(request.pose.pose),
+                captured_ns, request.overwrite)
             response.location = self._location_message(saved)
         response.success, response.message = True, 'Location saved'
         return response

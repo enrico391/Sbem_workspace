@@ -1,6 +1,6 @@
 # SBEM waypoint manager
 
-Save the current robot pose under a name and return to it later using Nav2.
+Save the current robot pose or an explicit pose under a name and return to it later using Nav2.
 Locations and their static map snapshots persist in a SQLite database.
 
 ## Build and run
@@ -17,13 +17,17 @@ ros2 launch sbem_waypoint_manager waypoint_manager.launch.py
 
 Run alongside your existing localization/Nav2 bringup. For simulation, add
 `use_sim_time:=true`. The node needs Nav2's static `/map` and a recent
-`map -> base_link` TF. It does not start navigation or localization servers.
+`map -> base_link` TF to capture the robot's pose. Saving an explicit pose only
+requires the current map. It does not start navigation or localization servers.
 
 ## Services
 
 ```bash
 # Capture the robot's current map pose, including its orientation.
 ros2 service call /waypoint_manager/save_location sbem_waypoint_interfaces/srv/SaveLocation "{name: kitchen, overwrite: false}"
+
+# Save an explicit pose in global_frame, without looking up the robot's TF.
+ros2 service call /waypoint_manager/save_location_pose sbem_waypoint_interfaces/srv/SaveLocationPose "{name: desk, map_id: '', pose: {header: {frame_id: map}, pose: {position: {x: 2.0, y: 3.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}, overwrite: false}"
 
 # Retrieve a freshly stamped pose suitable for a Nav2 goal.
 ros2 service call /waypoint_manager/get_location sbem_waypoint_interfaces/srv/GetLocation "{name: kitchen}"
@@ -40,12 +44,18 @@ ros2 service call /waypoint_manager/delete_location sbem_waypoint_interfaces/srv
 
 An empty `map_id` selects the currently received map. Supply a saved map ID to
 retrieve/list/delete locations or retrieve a map from a different session.
-`save_location` always uses the current map. Duplicate names require
+`save_location` always uses the current map. `save_location_pose` accepts an
+empty `map_id` or the current map ID and rejects any other map ID. Its
+`pose.header.frame_id` must equal the configured `global_frame`; the pose must
+contain finite values and a normalized quaternion. Duplicate names require
 `overwrite: true`; different maps can each have a `kitchen`.
 
 Every response includes `success` and `message`. Save/get/list responses include
 location map IDs, capture times and `map_matches_current`. Returned poses have
-current header timestamps; `captured_at` preserves the original TF timestamp.
+current header timestamps; `captured_at` preserves the original TF timestamp
+or the explicit pose's timestamp. For an explicit pose with a zero timestamp,
+`captured_at` uses the manager's current time. Explicit poses are not subject
+to the robot TF freshness check.
 
 `goto_location` success means **Nav2 accepted the goal**, not that the robot
 arrived. Its `goal_id` is Nav2's UUID as 32 hex characters. Results are logged;

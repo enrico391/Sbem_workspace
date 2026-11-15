@@ -9,7 +9,7 @@ rclpy = pytest.importorskip('rclpy')
 pytest.importorskip('nav2_msgs', reason='Nav2 messages are required for ROS integration')
 pytest.importorskip('sbem_waypoint_interfaces.srv', reason='Build waypoint interfaces first')
 from action_msgs.msg import GoalStatus
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import PoseStamped, TransformStamped
 from nav_msgs.msg import OccupancyGrid
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
@@ -22,6 +22,7 @@ from tf2_ros import TransformBroadcaster
 
 from sbem_waypoint_interfaces.srv import (
     DeleteLocation, GetLocation, GetMap, GotoLocation, ListLocations, SaveLocation,
+    SaveLocationPose,
 )
 from sbem_waypoint_manager.node import WaypointManager
 
@@ -182,6 +183,31 @@ def test_services_capture_retrieve_delete_and_map_roundtrip(harness):
     assert old.success and not old.location.map_matches_current
     assert harness.call(DeleteLocation, 'delete_location', name='home', map_id=original_id).success
     assert not harness.call(GetLocation, 'get_location', name='home', map_id=original_id).success
+
+
+def test_save_location_pose_service_without_robot_tf(harness):
+    harness.publish_map()
+    pose = PoseStamped()
+    pose.header.frame_id = 'map'
+    pose.pose.position.x = 7.
+    pose.pose.position.y = 8.
+    pose.pose.orientation.z = 0.6
+    pose.pose.orientation.w = 0.8
+    saved = harness.call(SaveLocationPose, 'save_location_pose', name='desk', pose=pose)
+    assert saved.success, saved.message
+    assert saved.location.map_id == harness.manager.current_map_id
+    assert saved.location.map_matches_current
+    retrieved = harness.call(GetLocation, 'get_location', name='desk')
+    assert retrieved.success, retrieved.message
+    assert retrieved.location.pose.pose == pose.pose
+    assert retrieved.location.captured_at == saved.location.captured_at
+    listed = harness.call(ListLocations, 'list_locations')
+    assert [entry.name for entry in listed.locations] == ['desk']
+    pose.header.frame_id = 'odom'
+    rejected = harness.call(SaveLocationPose, 'save_location_pose', name='desk',
+                            pose=pose, overwrite=True)
+    assert not rejected.success
+    assert harness.call(DeleteLocation, 'delete_location', name='desk').success
 
 
 def test_stale_and_future_transforms_are_rejected(harness):

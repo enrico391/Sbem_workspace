@@ -8,6 +8,7 @@ find_package(nav_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Location.msg"
   "srv/SaveLocation.srv"
+  "srv/SaveLocationPose.srv"
   "srv/GetLocation.srv"
   "srv/ListLocations.srv"
   "srv/DeleteLocation.srv"
