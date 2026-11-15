@@ -107,5 +107,13 @@ For a separate launch with the camera component container running:
 ## Waypoint manager:
 The package [`sbem_waypoint_manager`](src/sbem_waypoint_manager/README.md) provides a simple interface to manage waypoints for the robot. It allows you to save, retrieve, remove, and list named locations, and navigate to them with Nav2. Locations and map snapshots are stored in SQLite. The full robot bringup starts it automatically.
 
+## Voice agent
+
+The agent with voice support is available in [sbem_voice_agent](https://github.com/enrico391/sbem_voice_agent).
+
+## Web App interface
+
+The web app interface is available in [sbem_web_app](https://github.com/enrico391/sbem_webapp_control).
+
 ## Firmware on ESP32
 The ESP32 is responsible for controlling the Odrive via UART. The firmware for the ESP32 is located at this [page](https://github.com/enrico391/ROS2_communicationES32/tree/ros2_control_version)
