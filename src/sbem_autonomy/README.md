@@ -59,3 +59,62 @@ Navigation and docking must be active, with consistent velocity routing, and
 the dock pose, detection, current threshold, and charging calibration must be
 validated before enabling motion. `charging_threshold: 1.5` in the docking
 configuration is a current threshold in amperes, not the battery percentage.
+
+## Lidar motor supervision
+
+`lidar_motor_node` is a **separate ROS node**, optionally launched with
+`autonomy.launch.py enable_lidar_motor:=true`. It subscribes directly to
+`/battery_state`; disabling the charging
+BT through `set_enabled` does not disable this node. It can also run alone,
+including when automatic docking supervision is not launched:
+
+```bash
+ros2 launch sbem_autonomy lidar_motor.launch.py
+```
+
+Run only one motor supervisor. Set `enable_lidar_motor:=false` on
+`autonomy.launch.py` if already launching it separately. A custom motor YAML can
+be supplied with `lidar_params_file:=/path/to/lidar_motor.yaml` to either launch.
+
+The policy uses battery status, independently of battery percentage:
+
+- Stable `CHARGING` or `FULL`: request motor stopped.
+- Stable `DISCHARGING`: request motor started, including after manual removal.
+- `UNKNOWN`, `NOT_CHARGING`, unsupported status, no readings, or stale readings:
+  request motor started conservatively.
+
+Defaults in `config/lidar_motor.yaml` are a 1 second check period, 2 second
+debounce, and 5 second battery timeout. Timeouts use steady time, so they still
+work when simulation time pauses. Charging/full share the same debounce state.
+Unknown and stale data bypass debounce. After a data gap, charging must pass
+debounce again before stopping the motor.
+
+The node calls `/start_motor` and `/stop_motor` (`std_srvs/srv/Empty`)
+asynchronously, on desired-state changes, starting with a desired motor-on state.
+Unavailable or timed-out services are retried every 3 seconds; request timeout
+is 3 seconds. Requests are tracked one at a time; pending calls are cleaned up
+on timeout, and retries use the latest battery state. These names and all timing
+values are configurable. Ensure the RPLIDAR driver's `auto_standby` mode is
+disabled, since that mode ignores explicit motor service calls.
+
+At startup the node observes `/scan` for 2 seconds before issuing commands. Fresh
+scans confirm an already running lidar and suppress a redundant start request:
+the RPLIDAR start service reconfigures scanning even when the motor is running.
+`scan_topic`, `scan_timeout` (2 seconds), and `startup_observation_duration`
+(2 seconds) are configurable. A start is still sent after a stop, even if recent
+scan messages remain in the pipeline. Timeouts log the service name and requested
+state. A client timeout cannot interrupt a driver callback blocked in serial I/O;
+restart the lidar driver if parameter services also stop responding and scans
+cease. Increasing the client timeout cannot repair a blocked serial wait.
+
+Planner errors repeatedly referencing one old `base_link` timestamp indicate a
+pose outside TF history. Submit navigation goals in `map` (set RViz Fixed Frame
+to `map`) and cancel/resubmit an old goal after scans and localization recover.
+Stopping scans also pauses scan-based localization updates; this supervisor does
+not republish localization transforms or rewrite navigation goal timestamps.
+
+An Empty response confirms receipt, not physical motor operation or fresh scans.
+Manual removal restarts the motor after battery detection, debounce, the next
+check, and spin-up. This node does not prevent motion or orchestrate undocking;
+automatic undocking must still start the lidar and wait for fresh scans before
+moving. Confirm current polarity and motor service behavior on the robot.

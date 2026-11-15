@@ -27,16 +27,25 @@ ament_target_dependencies(autonomy_node
   rclcpp rclcpp_action sensor_msgs nav2_behavior_tree behaviortree_cpp_v3
   ament_index_cpp action_msgs std_msgs std_srvs)
 
-install(TARGETS autonomy_node DESTINATION lib/${PROJECT_NAME})
+add_executable(lidar_motor_node src/lidar_motor_node.cpp)
+target_compile_features(lidar_motor_node PUBLIC cxx_std_17)
+target_include_directories(lidar_motor_node PRIVATE include)
+ament_target_dependencies(lidar_motor_node rclcpp sensor_msgs std_srvs)
+
+install(TARGETS autonomy_node lidar_motor_node DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY behavior_trees config launch DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_battery_policy test/test_battery_policy.cpp)
   target_include_directories(test_battery_policy PRIVATE include)
+  ament_add_gtest(test_lidar_motor_policy test/test_lidar_motor_policy.cpp)
+  target_include_directories(test_lidar_motor_policy PRIVATE include)
   find_package(ament_cmake_pytest REQUIRED)
   ament_add_pytest_test(test_autonomy test/test_autonomy.py TIMEOUT 90
     ENV ROS_DOMAIN_ID=177 ROS_LOCALHOST_ONLY=1)
+  ament_add_pytest_test(test_lidar_motor test/test_lidar_motor.py TIMEOUT 60
+    ENV ROS_DOMAIN_ID=178 ROS_LOCALHOST_ONLY=1)
 endif()
 
 ament_package()

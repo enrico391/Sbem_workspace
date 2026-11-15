@@ -1,0 +1,14 @@
+lidar_motor:
+  ros__parameters:
+    battery_topic: /battery_state
+    scan_topic: /scan
+    # Observe an already running driver before issuing a start command.
+    startup_observation_duration: 2.0
+    scan_timeout: 2.0
+    start_motor_service: /start_motor
+    stop_motor_service: /stop_motor
+    check_period: 1.0
+    debounce_duration: 2.0
+    battery_timeout: 5.0
+    service_timeout: 3.0
+    retry_interval: 3.0
