@@ -49,6 +49,9 @@ def generate_launch_description():
                     'waypoint_manager.launch.py'
                 )
             ),
+            launch_arguments={
+                'database_path': '/workspaces/isaac_ros-dev/data/waypoints/sbem_waypoints.sqlite'
+            }.items(),
         ),
 
         GroupAction(
