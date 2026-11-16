@@ -17,6 +17,8 @@ def generate_launch_description():
                 'serial_port': '/dev/ttyUSB0',
                 'frame_id': 'laser_frame',
                 'angle_compensate': True,
+                # Explicit motor services are ignored in auto-standby mode.
+                'auto_standby': False,
                 'scan_mode': 'Standard',
                 'serial_baudrate':115200
             }]
