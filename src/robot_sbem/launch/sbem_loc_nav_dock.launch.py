@@ -9,7 +9,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
+from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -21,7 +21,7 @@ def generate_launch_description():
         description='Use simulation clock if true')
     declare_use_composition_cmd = DeclareLaunchArgument(
         'use_composition',
-        default_value='False',
+        default_value='True',
         description='Use composed bringup if True')
     
     declare_container_name_cmd = DeclareLaunchArgument(
@@ -39,7 +39,34 @@ def generate_launch_description():
         launch_arguments={'use_sim_time': use_sim_time}.items(),
         condition=IfCondition(LaunchConfiguration('enable_autonomy')))
     use_composition = LaunchConfiguration('use_composition')
-    container_name = LaunchConfiguration('container_name')  
+    container_name = LaunchConfiguration('container_name') 
+
+
+    configured_params = RewrittenYaml(
+        source_file=LaunchConfiguration(
+            'params_file',
+            default=os.path.join(
+                get_package_share_directory('robot_sbem'),
+                'config',
+                'nav2_params.yaml',
+            ),
+        ),
+        root_key=LaunchConfiguration('namespace', default=''),
+        param_rewrites={'use_sim_time': use_sim_time},
+        convert_types=True,
+    )
+
+    # container initialization if composition is True
+    nav2_container = Node(
+        condition=IfCondition(use_composition),
+        package='rclcpp_components',
+        executable='component_container_isolated',
+        name=container_name,
+        namespace=LaunchConfiguration('namespace', default=''),
+        output='screen',
+        parameters=[configured_params],
+        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')],
+    ) 
 
     localization_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(
@@ -69,27 +96,6 @@ def generate_launch_description():
             name='dock_pose_publisher',
             parameters=[{'use_first_detection': True, 'dock_tag_id': 0}],
     )
-
-    apriltag_detector_realsense_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(
-            get_package_share_directory('isaac_ros_apriltag'), 
-            'launch', 
-            'isaac_ros_apriltag_realsense.launch.py'))
-    )
-
-    # ros_bridge_server = Node(
-    #     package='rosbridge_server',
-    #     executable='rosbridge_websocket',
-    #     name='rosbridge_websocket',
-    #     output='screen',
-    # )
-
-    # server_stt = Node(
-    #     package='sbem_speaking',
-    #     executable='stt_socket_server.py',
-    #     name='audio_transcription_server',
-    #     output='screen',
-    # )
     
     # Launch!
     return LaunchDescription([
@@ -97,12 +103,10 @@ def generate_launch_description():
         declare_enable_autonomy_cmd,
         declare_use_composition_cmd,
         declare_container_name_cmd,
-        #apriltag_detector_realsense_node,
+        nav2_container,
         dock_pose_publisher,
         localization_node,
         navigation_node,
         docking_node,
         autonomy_node,
-        # ros_bridge_server,
-        # server_stt,
     ])
