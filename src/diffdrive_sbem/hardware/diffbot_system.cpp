@@ -179,6 +179,7 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_deactivate(
 hardware_interface::return_type DiffBotSystemHardware::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
 {
+  // used for timing statistics
   static SteadyClock::time_point previous_read_start{};
   static TimingStats cycle_period;
   static TimingStats encoder_request;
@@ -194,13 +195,18 @@ hardware_interface::return_type DiffBotSystemHardware::read(
   double odrive_right_ms = std::numeric_limits<double>::quiet_NaN();
   double odrive_left_ms = std::numeric_limits<double>::quiet_NaN();
   std::array<double, 6> imu;
+  
+  // Read values from the hardware interface
   comms_.read_values(
     wheel_l_.turns, wheel_r_.turns, battery_.voltage, battery_.current,
     odrive_right_ms, odrive_left_ms, imu);
+  
   for (size_t n = 0; n < 3; ++n) {
     imu_state_[4 + n] = imu[3 + n];
     imu_state_[7 + n] = imu[n];
   }
+
+  // Update the timing statistics
   encoder_request.add(elapsed_ms(read_start, SteadyClock::now()));
   if (std::isfinite(odrive_right_ms) && std::isfinite(odrive_left_ms)) {
     odrive_right_read.add(odrive_right_ms);
@@ -230,8 +236,7 @@ hardware_interface::return_type DiffBotSystemHardware::read(
     odrive_left_read.reset();
   }
 
-
-  // Debug: Log raw encoder values
+  // Debug: Log raw values from the serial connection
   static int debug_counter = 0;
   if (debug_counter++ % 10 == 0) {
     RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), 
@@ -239,20 +244,16 @@ hardware_interface::return_type DiffBotSystemHardware::read(
       wheel_l_.turns, wheel_r_.turns, wheel_l_.pos, wheel_r_.pos, battery_.voltage, battery_.current);
   }
 
-
+  // Calculate velocity based on the change in position over the elapsed time
   double delta_seconds = period.seconds();
-
   double pos_prev = wheel_l_.pos;
   wheel_l_.pos = wheel_l_.update_from_turns();
-
   wheel_l_.vel = (wheel_l_.pos - pos_prev) / delta_seconds;
 
   pos_prev = wheel_r_.pos;
-  //std::cout << "Wheel R pos: " << wheel_r_.turns << std::endl;
   wheel_r_.pos = wheel_r_.update_from_turns();
   wheel_r_.vel = (wheel_r_.pos - pos_prev) / delta_seconds;
   
-
   return hardware_interface::return_type::OK;
 }
 

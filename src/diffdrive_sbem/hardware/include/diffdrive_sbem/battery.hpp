@@ -1,5 +1,5 @@
-#ifndef DIFFDRIVE_ARDUINO_BATTERY_HPP
-#define DIFFDRIVE_ARDUINO_BATTERY_HPP
+#ifndef DIFFDRIVE_ESP32_BATTERY_HPP
+#define DIFFDRIVE_ESP32_BATTERY_HPP
 
 #include <string>
 #include <cmath>
@@ -27,4 +27,4 @@ class Battery
 };
 
 
-#endif // DIFFDRIVE_ARDUINO_BATTERY_HPP
+#endif // DIFFDRIVE_ESP32_BATTERY_HPP

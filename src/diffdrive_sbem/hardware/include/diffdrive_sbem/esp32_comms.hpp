@@ -1,10 +1,8 @@
-#ifndef DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
-#define DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
+#ifndef ESP32_COMMS_HPP
+#define ESP32_COMMS_HPP
 
-// #include <cstring>
 #include <sstream>
 #include <limits>
-// #include <cstdlib>
 #include <vector>
 #include <libserial/SerialPort.h>
 #include <iostream>
@@ -32,12 +30,12 @@ LibSerial::BaudRate convert_baud_rate(int baud_rate)
   }
 }
 
-class ArduinoComms
+class Esp32Comms
 {
 
 public:
 
-  ArduinoComms() = default;
+  Esp32Comms() = default;
 
   void connect(const std::string &serial_device, int32_t baud_rate, int32_t timeout_ms)
   {  
@@ -57,7 +55,7 @@ public:
   }
 
 
-  std::string send_msg(const std::string &msg_to_send, bool print_output = true)
+  std::string send_msg(const std::string &msg_to_send)
   {
     serial_conn_.FlushIOBuffers(); // Just in case
     serial_conn_.Write(msg_to_send);
@@ -72,11 +70,6 @@ public:
     {
         std::cerr << "The ReadByte() call has timed out." << std::endl ;
     }
-
-    // if (print_output)
-    // {
-    //   std::cout << "Sent: " << msg_to_send << " Recv: " << response << std::endl;
-    // }
 
     return response;
   }
@@ -123,4 +116,4 @@ private:
     int timeout_ms_;
 };
 
-#endif // DIFFDRIVE_ARDUINO_ARDUINO_COMMS_HPP
+#endif // DIFFDRIVE_ESP32_BATTERY_HPP

@@ -31,7 +31,7 @@
 #include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
-#include "diffdrive_sbem/arduino_comms.hpp"
+#include "diffdrive_sbem/esp32_comms.hpp"
 #include "diffdrive_sbem/wheel.hpp"
 #include "diffdrive_sbem/battery.hpp"
 
@@ -78,7 +78,7 @@ public:
 
 private:
   // Serial communication object
-  ArduinoComms comms_;
+  Esp32Comms comms_;
   Config cfg_;
 
   Wheel wheel_l_;
